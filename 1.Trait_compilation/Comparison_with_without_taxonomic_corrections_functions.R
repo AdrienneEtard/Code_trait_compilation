@@ -174,11 +174,11 @@ Plot.Cov <- function(TraitData, Traits, Main, PredictsTrue, Predicts) {
   
   Names <- as.data.frame(c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm","log10_Body_length_mm",
                            "log10_Svl_length_mm","log10_Generation_length_d", "log10_Longevity_d", "log10_Maturity_d", "log10_AFR_d",
-                           "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","Specialisation","sqrt_Habitat_breadth_IUCN", "EV_1"))
+                           "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","sqrt_Diet_breadth", "Specialisation","sqrt_Habitat_breadth_IUCN", "EV_1"))
   colnames(Names) <- "Original"
   Names$FP <- c("Body mass", "Svl length", "Forearm length", "Head length", "Body length", "Svl length", "Generation length", "Longevity", "Sexual maturity age",
                 "Age 1st reproduction","Litter/clutch size", "Range size",
-                "Diel activity", "Trophic level", "Specialisation", "Habitat breadth", "Phylogenetic position")
+                "Diel activity", "Trophic level", "Diet breadth","Specialisation", "Habitat breadth", "Phylogenetic position")
   
   # Traits <- Traits[-which(Traits=="EV_1")]
   
@@ -230,14 +230,14 @@ Plot.Delta.Cov <- function(TraitData1, TraitData2, Traits_name, PredictsTrue, Pr
   
   Names <- c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm","log10_Body_length_mm",
              "log10_Svl_length_mm","log10_Generation_length_d", "log10_Longevity_d", "log10_Maturity_d", "log10_AFR_d",
-             "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","Primary_diet","Specialisation","sqrt_Habitat_breadth_IUCN") %>%
+             "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","sqrt_Diet_breadth","Primary_diet","Specialisation","sqrt_Habitat_breadth_IUCN") %>%
     as.data.frame() %>%
     setNames(., "Original")
   
   Names$FP <- c("Body mass", "Svl length", "Forearm length", "Head length", "Body length", "Svl length",
                 "Generation length", "Longevity", "Sexual maturity age", "Age 1st reproduction",
                 "Litter/clutch size", "Range size",
-                "Diel activity", "Trophic level","Primary diet", "Specialisation", "Habitat breadth")
+                "Diel activity", "Trophic level","Diet breadth","Primary diet", "Specialisation", "Habitat breadth")
 
   
   Completeness1 <- apply(TraitData1[, Traits_name], 2,  function(y) sum(!is.na(y))) 

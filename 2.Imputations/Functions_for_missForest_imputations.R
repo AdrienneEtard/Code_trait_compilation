@@ -21,8 +21,6 @@
 
 Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, EV, ErrorTrue, DietTRUE) {
   
-# browser()
-  
   ## Select traits of interest, to impute, and phylogenetic eigenvectors, and taxinfo 
   To_impute <- TraitDF[, colnames(TraitDF) %in% c(Taxinfo, Traits_cont, Traits_cat, EV)]
   rownames(To_impute) <- TraitDF$Best_guess_binomial
@@ -64,13 +62,17 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   Errors <- R.Imputed$OOBerror
   
   ## Select traits and variables of interest
-  Continuous <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", 
-                    "Range_size_m2", "sqrt_Habitat_breadth_IUCN")
-  
   if(DietTRUE) {
-  Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level", Diet)}
+    Continuous <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", 
+                    "Range_size_m2", "sqrt_Habitat_breadth_IUCN", "sqrt_Diet_breadth")
   
-  else{Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level")}
+    Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level", Diet)
+  }
+  
+  else{
+    Continuous <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", 
+                     "Range_size_m2", "sqrt_Habitat_breadth_IUCN")
+    Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level")}
   
   Imputed$Best_guess_binomial <- rownames(Imputed)
   Imputed <- Imputed[order(Imputed$Best_guess_binomial), c(Taxinfo, "Best_guess_binomial", Continuous, Categorical, "EV_1")]
@@ -80,280 +82,75 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   Imputed$Phylo_info[!is.na(Imputed$Phylo_info)] <- "YES"
   Imputed$Phylo_info[is.na(Imputed$Phylo_info)] <- "NO"
   
+  ## Add taxonomic information
+  Imputed$Order <- TraitDF$Order
+  Imputed$Family <- TraitDF$Family
+  Imputed$Genus <- TraitDF$Genus
+  
+  ## Reprocess Primary diet and diet breadth (sqrt + normalise) if diet is included
+  ## Then reorder columns.
+  
+  if(DietTRUE){
+    
+    Func <- function(X) {
+      names(X) <- Diet
+      ToPaste <- names(X)[which(X==1)]
+      return(paste(ToPaste, collapse = "|"))
+    }
+    
+    Imputed$Primary_diet <- apply(Imputed[,Diet], 1, Func)
+    
+    Imputed[, Diet] <- apply(Imputed[, Diet], 2, as.numeric)
+    Imputed$sqrt_Diet_breadth_reprocessed <- apply(Imputed[, Diet], 1, sum, na.rm=T) %>% sqrt()
+
+    Imputed <- Imputed[, c("Order", "Family", "Genus", "Best_guess_binomial",
+                         "log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size",
+                         "Diel_activity", "Specialisation", 
+                         "Trophic_level", "sqrt_Diet_breadth", "sqrt_Diet_breadth_reprocessed","Primary_diet", Diet,
+                         "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat)] 
+  
+  }
+  
+  else{ 
+    
+    Imputed$Primary_diet <- NA
+    Imputed$sqrt_Diet_breadth <- NA
+    
+    Imputed <- Imputed[, c("Order", "Family", "Genus", "Best_guess_binomial",
+                           "log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size",
+                           "Diel_activity", "Specialisation","Trophic_level", "sqrt_Diet_breadth", "Primary_diet",
+                           "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat)]
+  }
+  
+  rownames(Imputed) <- c(1:nrow(Imputed))
+  
   ## Return
-  return(list(Imputed.Values=Imputed, Imputations.Errors=Errors))
+  
+  ToReturn <- list(Imputed.Dataset=Imputed, Imputation.errors=Errors)
+  ToReturn <- list(ToReturn)
+  
+  return(ToReturn)
   
 }
 
 
+## Function to apply in parallel (runs the aboce function Imputations_missForest)
+To_apply_parallel_imputations <- function (List_of_arguments) {
 
+  ## NB: which function to use here on windows to replace pbmapply (or mapply)?
+  ## mapply only works with forking methods (unix or linux)
 
-## Function to impute missing values for species that are not represented in the phylogeny 
+  Imputations_results <- pbmapply (FUN=Imputations_missForest,
+                          TraitDF=List_of_arguments[["TraitDF"]],
+                          Taxinfo=List_of_arguments[["Taxinfo"]],
+                          Traits_cont=List_of_arguments[["Traits_cont"]],
+                          Traits_cat=List_of_arguments[["Traits_cat"]],
+                          EV=List_of_arguments[["EV"]],
+                          ErrorTrue=List_of_arguments[["ErrorTrue"]],
+                          DietTRUE=List_of_arguments[["DietTRUE"]])
 
-# Imputations_missForest_other <- function (OriginalTraitDF, ImputedDF, TraitsCont, TraitsCat, Habitat, ErrorTrue) {
-#   
-#   ## Get species that are not in the imputed dataset, select traits and add to the imputed dataset
-#   ToAdd <- setdiff(OriginalTraitDF$Best_guess_binomial, rownames(ImputedDF))
-#   ToAdd <- subset(OriginalTraitDF, Best_guess_binomial %in% ToAdd)
-#   rownames(ToAdd) <- ToAdd$Best_guess_binomial
-#   
-#   ## select traits to impute
-#   ToAdd <- ToAdd[, colnames(ToAdd) %in% c(TraitsCont, TraitsCat, Habitat)]
-#   
-#   # ## Set Diet breadth as factor 
-#   # if (any(colnames(ToAdd) %in% "Diet_breadth")) {
-#   #   Upper <- max(ImputedDF[, "Diet_breadth"], na.rm=T)
-#   #   ToAdd[, "Diet_breadth"] <- as.factor(ToAdd[, "Diet_breadth"])
-#   #   levels(ToAdd[, "Diet_breadth"]) <- c(1:Upper)
-#   # }
-#   
-#   ToImpute <- rbind(ImputedDF, ToAdd)
-#   
-#   ## Impute with missForest
-#   print("IMPUTATIONS.")
-#   if (isTRUE(ErrorTrue)) {
-#     Imputed <- missForest(ToImpute, variablewise = TRUE)
-#   } else {Imputed <- missForest(ToImpute, variablewise = FALSE)}
-#   
-#   ImputedValues <- Imputed$ximp
-#   ImputedErrors <- Imputed$OOBerror
-#   
-#   ## Species for which there was no phylogenetic information:
-#   # rownames(ToAdd)
-#   
-#   ## RETURN
-#   return(list(ImputedValues=ImputedValues, ImputedErrors=ImputedErrors, Sp_No_phylo_info=rownames(ToAdd)))
-#   
-# }
-# 
-
-
-
-
-# Imputations_missForest <- function (Phylo, TraitDF, Traits_cont, Trait_cat, Habitat, N, ErrorTrue) {
-#   
-#   browser()
-#   
-#   ## Prune species that do not intersect
-#   row.names(TraitDF) <- TraitDF$Best_guess_binomial
-#   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
-#   Phylo <- Prune_Taxa$phy
-#   TraitDF <- Prune_Taxa$data
-#   
-#   ## Select traits of interest
-#   TraitDF <- TraitDF[, colnames(TraitDF) %in% c(Traits_cont, Trait_cat, Habitat)]
-#   
-#   ## Set class as numeric for continuous
-#   for (i in Traits_cont) {TraitDF[, i] <- as.numeric(as.character(TraitDF[, i]))}
-#   
-#   # ## Set Diet breadth as factor 
-#   # if (any(colnames(TraitDF) %in% "Diet_breadth")) {
-#   #   Upper <- max(TraitDF[, "Diet_breadth"], na.rm=T)
-#   #   TraitDF[, "Diet_breadth"] <- as.factor(TraitDF[, "Diet_breadth"])
-#   #   levels(TraitDF[, "Diet_breadth"]) <- c(1:Upper)
-#   # }
-#   
-#   ## Get phylogenetic eigenvectors from the phylogeny and select N first eigenvectors
-#   print("EIGENVECTOR DECOMPOSITION.")
-#   EigenV <- PVRdecomp(Phylo)
-#   Eigenvectors <- EigenV@Eigen$vectors
-#   
-#   Eigenvectors <- as.data.frame(Eigenvectors)
-#   Eigenvectors <- Eigenvectors[, 1:N]
-#   
-#   ## Bind eigenvectors to trait dataframe, to use them as predictors
-#   ToImpute <- cbind(TraitDF, Eigenvectors)
-#   
-#   ## Impute
-#   print("IMPUTATIONS.")
-#   
-#   if (isTRUE(ErrorTrue)) {
-#   Imputed <- missForest(ToImpute, variablewise = TRUE)
-#   } else {
-#   Imputed <- missForest(ToImpute, variablewise = FALSE)}
-#   
-#   ImputedValues <- Imputed$ximp
-#   ImputedErrors <- Imputed$OOBerror
-#   
-#   ## Remove eigenvectors from imputed dataset
-#   ImputedValues <- ImputedValues[, colnames(ImputedValues) %in% c(Traits_cont, Trait_cat, Habitat)]
-# 
-#   ## RETURN
-#   return(list(ImputedValues=ImputedValues, ImputedErrors=ImputedErrors))
-#   
-# }
-# 
-# 
-# ## Function to impute missing values for species that are not represented in the phylogeny 
-# 
-# Imputations_missForest_other <- function (OriginalTraitDF, ImputedDF, TraitsCont, TraitsCat, Habitat, ErrorTrue) {
-# 
-#   ## Get species that are not in the imputed dataset, select traits and add to the imputed dataset
-#   ToAdd <- setdiff(OriginalTraitDF$Best_guess_binomial, rownames(ImputedDF))
-#   ToAdd <- subset(OriginalTraitDF, Best_guess_binomial %in% ToAdd)
-#   rownames(ToAdd) <- ToAdd$Best_guess_binomial
-#   
-#   ## select traits to impute
-#   ToAdd <- ToAdd[, colnames(ToAdd) %in% c(TraitsCont, TraitsCat, Habitat)]
-#   
-#   # ## Set Diet breadth as factor 
-#   # if (any(colnames(ToAdd) %in% "Diet_breadth")) {
-#   #   Upper <- max(ImputedDF[, "Diet_breadth"], na.rm=T)
-#   #   ToAdd[, "Diet_breadth"] <- as.factor(ToAdd[, "Diet_breadth"])
-#   #   levels(ToAdd[, "Diet_breadth"]) <- c(1:Upper)
-#   # }
-#   
-#   ToImpute <- rbind(ImputedDF, ToAdd)
-#   
-#   ## Impute with missForest
-#   print("IMPUTATIONS.")
-#   if (isTRUE(ErrorTrue)) {
-#     Imputed <- missForest(ToImpute, variablewise = TRUE)
-#   } else {Imputed <- missForest(ToImpute, variablewise = FALSE)}
-#   
-#   ImputedValues <- Imputed$ximp
-#   ImputedErrors <- Imputed$OOBerror
-#   
-#   ## Species for which there was no phylogenetic information:
-#   # rownames(ToAdd)
-#   
-#   ## RETURN
-#   return(list(ImputedValues=ImputedValues, ImputedErrors=ImputedErrors, Sp_No_phylo_info=rownames(ToAdd)))
-#   
-# }
-
-
-# NUMBER OF EIGENVECTORS --------------------------------------------------
-
-## function to prune phylo and trait dataset and to get set of phylogenetic eigenvectors
-
-# Phylo_eigenvectors <- function(Phylo, TraitDF) {
-#   
-#   ## Prune species that do not intersect
-#   row.names(TraitDF) <- TraitDF$Best_guess_binomial
-#   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
-#   Phylo <- Prune_Taxa$phy
-#   TraitDF <- Prune_Taxa$data
-#   
-#   ## Get phylogenetic eigenvectors from the phylogeny
-#   EigenV <- PVRdecomp(Phylo)
-#   Eigenvectors <- EigenV@Eigen$vectors
-#   
-#   Eigenvectors <- as.data.frame(Eigenvectors)
-#   
-#   return(Eigenvectors)
-# }
-
-
-# Imputations_missForest_Error <- function (Phylo, Phylo_eigenv, TraitDF, Traits_cont, Trait_cat, ErrorTrue, Seq) {
-#   
-#   ## Prune species that do not intersect
-#   row.names(TraitDF) <- TraitDF$Best_guess_binomial
-#   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
-#   Phylo <- Prune_Taxa$phy
-#   TraitDF <- Prune_Taxa$data
-#   
-#   ## Select traits of interest
-#   TraitDF <- TraitDF[, colnames(TraitDF) %in% c(Traits_cont, Trait_cat)]
-#   
-#   ## Set class as numeric for continuous
-#   for (i in Traits_cont) {TraitDF[, i] <- as.numeric(as.character(TraitDF[, i]))}
-#   
-#   ## Set Diet breadth as factor with 11 levels (1 to 11) 
-#   if (any(colnames(TraitDF) %in% "Diet_breadth")) {
-#     TraitDF[, "Diet_breadth"] <- as.factor(TraitDF[, "Diet_breadth"])
-#     levels(TraitDF[, "Diet_breadth"]) <- c(1:11)
-#   }
-# 
-#   
-#   ## Dataset to store error results
-#   ErrorDF <- as.data.frame(Seq)
-#   
-#   
-#   for (i in 1:length(Seq)) {
-#     
-#       ## Bind eigenvectors to trait dataframe, to use them as predictors
-#       ToImpute <- cbind(TraitDF, Phylo_eigenv[1:Seq[i]])
-#       
-#       
-#       ## Impute
-#       if (isTRUE(ErrorTrue)) {
-#         Imputed <- missForest(ToImpute, variablewise = TRUE)
-#       } else {Imputed <- missForest(ToImpute, variablewise = FALSE)}
-#       
-#      
-#       ErrorDF$NRMSE[i] <- Imputed$OOBerror["NRMSE"]
-#       ErrorDF$PFC[i] <- Imputed$OOBerror["PFC"]
-#   
-#       cat("\n \n", i, "\n \n of \n \n", length(Seq), "\n \n")
-#       
-#   }
-#   
-#   ## RETURN
-#   return(ErrorDF)
-#   
-# }
-# 
-# ###################
-# Imputations_missForest_ErrorSE <- function (Phylo, Phylo_eigenv, TraitDF, Traits_cont, Trait_cat, ErrorTrue, Seq, Rep) {
-#   
-#   ## Prune species that do not intersect
-#   row.names(TraitDF) <- TraitDF$Best_guess_binomial
-#   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
-#   Phylo <- Prune_Taxa$phy
-#   TraitDF <- Prune_Taxa$data
-#   
-#   ## Select traits of interest
-#   TraitDF <- TraitDF[, colnames(TraitDF) %in% c(Traits_cont, Trait_cat)]
-#   
-#   ## Set class as numeric for continuous
-#   for (i in Traits_cont) {TraitDF[, i] <- as.numeric(as.character(TraitDF[, i]))}
-#   
-#   ## Set Diet breadth as factor with 11 levels (1 to 11) 
-#   if (any(colnames(TraitDF) %in% "Diet_breadth")) {
-#     TraitDF[, "Diet_breadth"] <- as.factor(TraitDF[, "Diet_breadth"])
-#     levels(TraitDF[, "Diet_breadth"]) <- c(1:11)
-#   }
-#   
-#   
-#   ## Dataset to store error results
-#   ErrorDF <- as.data.frame(Seq)
-# 
-#   
-#   for (i in 1:length(Seq)) {
-#     
-#     ## Bind eigenvectors to trait dataframe, to use them as predictors
-#     ToImpute <- cbind(TraitDF, Phylo_eigenv[1:Seq[i]])
-#     
-#     ErrorRep <- as.data.frame(c(1:Rep))
-#     
-#      for (j in 1:Rep) {
-#            ## Impute
-#       if (isTRUE(ErrorTrue)) {
-#         Imputed <- missForest(ToImpute, variablewise = TRUE)
-#       } else {Imputed <- missForest(ToImpute, variablewise = FALSE)}
-#     
-#        ErrorRep$NRMSE[j] <- Imputed$OOBerror["NRMSE"]
-#        ErrorRep$PFC[j] <- Imputed$OOBerror["PFC"]
-#      }
-#     
-#     ## Calculate mean and SE for each replicate and store in ErrorDF
-#     ErrorDF$Mean_NRMSE[i] <- mean(ErrorRep$NRMSE)
-#     ErrorDF$SE_NRMSE[i] <- std.error(ErrorRep$NRMSE)
-#     
-#     ErrorDF$Mean_PFC[i] <- mean(ErrorRep$PFC)
-#     ErrorDF$SE_PFC[i] <- std.error(ErrorRep$PFC)
-#     
-#     cat("\n \n ", i, "\n \n of \n \n", length(Seq), "\n \n")
-#     
-#   }
-#   
-#   
-#   ## RETURN
-#   return(ErrorDF)
-#   
-# }
-# 
+  return (Imputations_results)
+}
 
 
 

@@ -21,45 +21,6 @@ C_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_co
 C_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Mammals.csv")
 C_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Reptiles.csv")
 
-
-# ## Quick compilation (eigenvectors take a long time to be extracted) -- corrected
-# EVC_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals_EV.csv")
-# EVC_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds_EV.csv")
-# EVC_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles_EV.csv")
-# EVC_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians_EV.csv")
-# 
-# ## BindC.EV_Mammals <- cbind(C_Mammals, EVC_Mammals)
-# C.EV_Birds <- cbind(C_Birds, EVC_Birds)
-# C.EV_Reptiles <- cbind(C_Reptiles, EVC_Reptiles)
-# C.EV_Amphibians <- cbind(C_Amphibians, EVC_Amphibians)
-# 
-# 
-# 
-# ## Quick compilation (eigenvectors take a long time to be extracted) -- uncorrected
-# EVU_Mammals <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals_EV.csv")
-# EVU_Birds <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds_EV.csv")
-# EVU_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles_EV.csv")
-# EVU_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians_EV.csv")
-# 
-# ## Bind
-# UN.EV_Mammals <- cbind(UN_Mammals, EVU_Mammals)
-# UN.EV_Birds <- cbind(UN_Birds, EVU_Birds)
-# UN.EV_Reptiles <- cbind(UN_Reptiles, EVU_Reptiles)
-# UN.EV_Amphibians <- cbind(UN_Amphibians, EVU_Amphibians)
-# 
-# ## Save
-# write.csv(C.EV_Amphibians, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv", row.names=FALSE)
-# write.csv(C.EV_Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv", row.names=FALSE)
-# write.csv(C.EV_Birds, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv", row.names=FALSE)
-# write.csv(C.EV_Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv", row.names=FALSE)
-# 
-# write.csv(UN.EV_Amphibians, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv", row.names=FALSE)
-# write.csv(UN.EV_Mammals, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv", row.names=FALSE)
-# write.csv(UN.EV_Reptiles, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv", row.names=FALSE)
-# write.csv(UN.EV_Birds, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv", row.names=FALSE)
-
-
-
 ## Load PREDICTS with and without taxonomic correction
 UN_Predicts <- readRDS("../../Data/PREDICTS_database.rds") %>%
   filter(Class %in% c("Aves", "Mammalia", "Reptilia", "Amphibia"))
@@ -107,36 +68,6 @@ write.csv(UN.EV_Mammals, "../../Results/1.Traits_before_imputations/Without_taxo
 write.csv(UN.EV_Reptiles, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv", row.names=FALSE)
 write.csv(UN.EV_Birds, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv", row.names=FALSE)
 
-
-## For quicker compilations: saving just the eigenvectors
-
-C_E_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-C_E_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-C_E_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-C_E_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-
-write.csv(C_E_Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals_EV.csv", row.names=F)
-write.csv(C_E_Birds, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds_EV.csv", row.names=F)
-write.csv(C_E_Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles_EV.csv", row.names=F)
-write.csv(C_E_Amphibians, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians_EV.csv", row.names=F)
-
-U_E_Mammals <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-U_E_Birds <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-U_E_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-U_E_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv") %>%
-  select(EV_1, EV_2, EV_3, EV_4, EV_5, EV_6, EV_7, EV_8, EV_9, EV_10)
-
-write.csv(U_E_Mammals, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals_EV.csv", row.names=F)
-write.csv(U_E_Birds, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds_EV.csv", row.names=F)
-write.csv(U_E_Reptiles, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles_EV.csv", row.names=F)
-write.csv(U_E_Amphibians, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians_EV.csv", row.names=F)
 
 
 

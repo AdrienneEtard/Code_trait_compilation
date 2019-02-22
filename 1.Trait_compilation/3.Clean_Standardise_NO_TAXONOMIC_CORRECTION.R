@@ -43,7 +43,7 @@ PredictsVertebrates <- readRDS("../../Data/PREDICTS_database.rds") %>%
 Reptiles$Longevity_d <- apply(Reptiles[, c("Longevity_d","Max_longevity_d")], 1, mean, na.rm=TRUE)
 Reptiles %<>% select(-Max_longevity_d)
 Reptiles[, (ncol(Reptiles)+1):(ncol(Reptiles)+2)] <- NA
-colnames(Reptiles)[c(25,26)] <- c("Primary_diet", "Diet_breadth")
+colnames(Reptiles)[c(25,26)] <- c("Primary_diet", "sqrt_Diet_breadth")
 
 # Amphibians
 colnames(Amphibians)[7] <- c("Longevity_d")
@@ -69,6 +69,8 @@ Mammals <- Transform_zscore(Mammals, "Maturity_d", "log10")
 Mammals <- Transform_zscore(Mammals, "AFR_d", "log10")
 Mammals <- Transform_zscore(Mammals, "Litter_size", "log10")
 Mammals <- Transform_zscore(Mammals, "Habitat_breadth_IUCN", "sqrt")
+Mammals <- Transform_zscore(Mammals, "Diet_breadth", "sqrt")
+
 
 # Reptiles
 Reptiles <- Transform_zscore(Reptiles, "Body_mass_g", "log10")
@@ -85,6 +87,8 @@ Birds <- Transform_zscore(Birds, "Maturity_d", "log10")
 Birds <- Transform_zscore(Birds, "Longevity_d", "log10")
 Birds <- Transform_zscore(Birds, "Litter_size", "log10")
 Birds <- Transform_zscore(Birds, "Habitat_breadth_IUCN", "sqrt")
+Birds <- Transform_zscore(Birds, "Diet_breadth", "sqrt")
+
 
 # Amphibians
 Amphibians <- Transform_zscore(Amphibians, "Body_mass_g", "log10")
@@ -94,6 +98,7 @@ Amphibians <- Transform_zscore(Amphibians, "Maturity_d", "log10")
 Amphibians <- Transform_zscore(Amphibians, "Longevity_d", "log10")
 Amphibians <- Transform_zscore(Amphibians, "Litter_size", "log10")
 Amphibians <- Transform_zscore(Amphibians, "Habitat_breadth_IUCN", "sqrt")
+Amphibians <- Transform_zscore(Amphibians, "Diet_breadth", "sqrt")
 
 
 ## Reorganising columns
@@ -104,17 +109,17 @@ Habitat <- c("Forest","Savanna","Shrubland","Grassland","Wetland","Rocky.areas",
 
 Reptiles <- Reptiles[, c("Best_guess_binomial",
                          "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
-                         "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "Diet_breadth","Primary_diet","Specialisation",
+                         "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth","Primary_diet","Specialisation",
                          "sqrt_Habitat_breadth_IUCN", Habitat)]
 
 Amphibians <- Amphibians[, c("Best_guess_binomial",
                          "log10_Body_mass_g", "log10_Body_length_mm","log10_Svl_length_mm", "log10_Maturity_d", "log10_Longevity_d",
-                         "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "Diet_breadth","Primary_diet", Diet,"Specialisation",
+                         "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth","Primary_diet", Diet,"Specialisation",
                          "sqrt_Habitat_breadth_IUCN", Habitat)]
 
 Birds <- Birds[, c("Best_guess_binomial",
                              "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
-                             "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "Diet_breadth", "Primary_diet",Diet,"Specialisation",
+                             "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth", "Primary_diet",Diet,"Specialisation",
                              "sqrt_Habitat_breadth_IUCN", Habitat)]
 
 
@@ -122,7 +127,7 @@ Birds <- Birds[, c("Best_guess_binomial",
 Mammals <- Mammals[, c("Best_guess_binomial",
                        "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm",
                        "log10_Generation_length_d","log10_Maturity_d", "log10_Longevity_d", "log10_AFR_d",
-                       "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "Diet_breadth","Primary_diet",Diet,"Specialisation",
+                       "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth","Primary_diet",Diet,"Specialisation",
                        "sqrt_Habitat_breadth_IUCN", Habitat)]
 
 

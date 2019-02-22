@@ -19,9 +19,9 @@ Syn_Birds <- read.csv("../../Results/0.Data_resolved_taxonomy/List_species_synon
 Syn_Reptiles <- read.csv("../../Results/0.Data_resolved_taxonomy/List_species_synonyms/Before_manual_checks/SYNONYMS_RL/Synonyms_reptiles_V2.csv")
 
 # # Check that corrected typos all have 2 words, otherwise take original name (Amphibians, mammals and reptiles are OK, birds need to be corrected)
-# Syn_Birds$CorrectedTypos <- as.character(Syn_Birds$CorrectedTypos)
-# Syn_Birds$N_words <- sapply(strsplit(Syn_Birds$CorrectedTypos, " "), length)
-# Syn_Birds$CorrectedTypos[Syn_Birds$N_words==1] <- as.character(Syn_Birds$Original[Syn_Birds$N_words==1])
+Syn_Birds$CorrectedTypos <- as.character(Syn_Birds$CorrectedTypos)
+Syn_Birds$N_words <- sapply(strsplit(Syn_Birds$CorrectedTypos, " "), length)
+Syn_Birds$CorrectedTypos[Syn_Birds$N_words==1] <- as.character(Syn_Birds$Original[Syn_Birds$N_words==1])
 
 # Run the function
 Syn_Mammals_ITIS <- Complement_ITIS(Syn_Mammals, Split = FALSE,1)

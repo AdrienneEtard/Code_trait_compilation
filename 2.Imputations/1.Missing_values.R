@@ -128,3 +128,30 @@ text(rep(115, 7), c(1:7), paste(round(NA_Mammals_F$Percentages[nrow(NA_Mammals_F
 
 mtext("Distribution of the proportion of missing values per families", side=1, line=4, at=-50)
 dev.off()
+
+
+
+## Plotting percent information across species
+
+Percent_info <- function(TraitDF, Traits) {
+  
+  TraitDF <- TraitDF[, c("Best_guess_binomial", Traits)]
+  Results <- apply(TraitDF[,Traits], 1, function(y) sum(!is.na(y))) %>% as.data.frame() %>%
+    setNames(., "Percent")
+  Results$Percent <- Results$Percent/length(Traits)*100
+  
+  return(Results)
+  
+}
+
+Test <- Percent_info(Mammals, TraitsMammals)
+Test <- Percent_info(Birds, TraitsBirds)
+Test <- Percent_info(Amphibians, TraitsAmphibians)
+Test <- Percent_info(Reptiles, TraitsReptiles)
+
+
+plot(density(Test$Percent))
+hist(Test$Percent, breaks = 10)
+
+
+
