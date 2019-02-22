@@ -52,7 +52,7 @@ MammalDIET2 <- read.csv("../../Data/Mammals/MammalDIET_2/MammalDIET2.csv")[, c(1
 colnames(MammalDIET2)[28] <- "DataSource"
 
 MammalDIET2_supp <- read.csv("../../Data/Mammals/MammalDIET_2/MammalDIET_2_supp.csv")
-MammalDIET2_supp$TrophicLevel %<>% as.character()
+MammalDIET2_supp$TrophicLevel <- as.character(MammalDIET2_supp$TrophicLevel)
 MammalDIET2_supp <- MammalDIET2_supp %>%
   mutate(TrophicLevel=ifelse(TrophicLevel %in% c("Carnivore", "Omnivore", "Herbivore"), TrophicLevel, NA)) %>%
   filter(!is.na(TrophicLevel)) %>%
@@ -62,7 +62,7 @@ MammalDIET2_supp <- MammalDIET2_supp %>%
   mutate(Frugivore=ifelse(Frugivore %in% c(0:3), Frugivore, NA))%>%
   mutate(Granivore=ifelse(Granivore %in% c(0:3), Granivore, NA)) %>%
   mutate(Folivore=ifelse(Folivore %in% c(0:3), Folivore, NA))
-MammalDIET2_supp[, c(6:27)] %<>% droplevels()
+MammalDIET2_supp[, c(6:27)] <- droplevels(MammalDIET2_supp[, c(6:27)])
   
 MammalDIET2 <- rbind(MammalDIET2, MammalDIET2_supp)
 MammalDIET2$Binomial <- as.character(MammalDIET2$Binomial)
@@ -278,7 +278,6 @@ IUCN_amphibian <-  Replace_by_accepted_name(Syn_Amphibians, IUCN_amphibian, "bin
 IUCN_bird <-  Replace_by_accepted_name(Syn_Birds, IUCN_bird, "binomial")
 IUCN_reptile <-  Replace_by_accepted_name(Syn_Reptiles, IUCN_reptile, "binomial")
 IUCN_mammal <-  Replace_by_accepted_name(Syn_Mammals, IUCN_mammal, "binomial")
-
 
 # Predicts dataset ## problem wiht species replacement here
 PredictsGenusLevel <- subset(Predicts, Best_guess_binomial == "")

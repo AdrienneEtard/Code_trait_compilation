@@ -817,17 +817,20 @@ Replace_by_accepted_name <- function(Syn, TargetDF, colnamespecies) {
   
       for (i in 1:length(Names)) {
         
-       if(Names[i]=="Desmodus draculae") {TargetDF$Best_guess_binomial[i] <-"Desmodus draculae"; next()}
+       if(Names[i]=="Desmodus draculae") {
+         
+         TargetDF$Best_guess_binomial[TargetDF[ , colnamespecies]==Names[i]] <-"Desmodus draculae"; next()}
         
         if(any(grepl(Names[i], Syn$Original))){
-      
-          TargetDF$Best_guess_binomial[i] <- Syn$Accepted[Syn$Original==Names[i]]
+    
+          TargetDF$Best_guess_binomial[TargetDF[ , colnamespecies]==Names[i]] <- Syn$Accepted[Syn$Original==Names[i]]
+          
         }
         
         else {
           
-          #TargetDF$Best_guess_binomial[TargetDF[ , colnamespecies]==Names[i]] <- Syn$Accepted[Syn$CorrectedTypos==Names[i]]
-          TargetDF$Best_guess_binomial[i] <- Syn$Accepted[Syn$CorrectedTypos==Names[i]]
+          TargetDF$Best_guess_binomial[TargetDF[ , colnamespecies]==Names[i]] <- Syn$Accepted[Syn$CorrectedTypos==Names[i]]
+          # TargetDF$Best_guess_binomial[i] <- Syn$Accepted[Syn$CorrectedTypos==Names[i]]
         }
        
         # print(i)

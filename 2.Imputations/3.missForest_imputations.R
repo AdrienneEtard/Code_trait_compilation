@@ -1,4 +1,4 @@
-# Imputations using missForest, with  phylogenetic eigenvectors as predictors -- imputation errors in another script.
+# Imputations using missForest, with  phylogenetic eigenvectors as predictors
 
 # still to do:
 # compare results from missForest imputations with results from phylogenetic imputations - at least for continuous traits?
@@ -24,8 +24,6 @@ clusterEvalQ(Cluster, {
 })
 
 # ## Preamble
-# X <- c("dplyr", "phytools", "missForest", "pbapply")
-# lapply(X, library, character.only=TRUE); rm(X)
 `%nin%` <- Negate(`%in%`)
 
 source("Functions_for_missForest_imputations.R")
@@ -88,37 +86,24 @@ rm(Mammals, Birds, Reptiles, Amphibians,
 	Habitat, Diet, Taxinfo, Traits_cont, Traits_cat,
 	MammalsCont, BirdsCont, ReptilesCont, AmphibiansCont,
 	DF.TraitsList, Taxinfo.List, Cont.TraitsList, Cat.TraitsList,
-	EV.List, ErrorTrue.List, DietTRUE.List, N)
+	EV.List, ErrorTrue.List, DietTRUE.List, N,
+	ArgumentsList)
 
 ## Export variables in all clusters
 clusterExport(cl=Cluster, list("Imputations_missForest",
-								"To_apply_parallel_imputations",
-								"To_impute_parallel",
-								"%nin%"), envir=environment())
+                               "To_apply_parallel_imputations",
+                               "To_impute_parallel",
+                               "%nin%"),
+              envir=environment())
 
 ## Parallel imputations on 8 cores
 Imputed_sets <- parLapply(cl=Cluster,
-							              X=To_impute_parallel,
-							              fun=To_apply_parallel_imputations)
+                          X=To_impute_parallel,
+                          fun=To_apply_parallel_imputations)
 
 ## Save results
 saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/imputed_datasets/List_8_imputed_sets.rds")
 
 ## DESTROY CLUSTER
 stopCluster(Cluster)
-
-
-# ## to test: this function and also the apply version calling this one
-# Test1 <- pbmapply (FUN=Imputations_missForest,
-#                    TraitDF=DF.TraitsList,
-#                    Taxinfo=Taxinfo,
-#                    Traits_cont=Cont.TraitsList,
-#                    Traits_cat=Cat.TraitsList,
-#                    EV=EV.List,
-#                    ErrorTrue=ErrorTrue.List,
-#                    DietTRUE=DietTRUE.List)
-# 
-
-Imputed_set_1 <- To_apply_parallel_imputations(ArgumentsList)
-saveRDS(Imputed_set_1, "../../Results/2.imputed_trait_datasets/imputed_datasets/Imputed_set_1.rds")
 
