@@ -107,7 +107,7 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
                          "log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size",
                          "Diel_activity", "Specialisation", 
                          "Trophic_level", "sqrt_Diet_breadth", "sqrt_Diet_breadth_reprocessed","Primary_diet", Diet,
-                         "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat)] 
+                         "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat, "Phylo_info")] 
   
   }
   
@@ -119,7 +119,7 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
     Imputed <- Imputed[, c("Order", "Family", "Genus", "Best_guess_binomial",
                            "log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size",
                            "Diel_activity", "Specialisation","Trophic_level", "sqrt_Diet_breadth", "Primary_diet",
-                           "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat)]
+                           "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat, "Phylo_info")]
   }
   
   rownames(Imputed) <- c(1:nrow(Imputed))

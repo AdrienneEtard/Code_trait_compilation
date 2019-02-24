@@ -102,7 +102,7 @@ Imputed_sets <- parLapply(cl=Cluster,
                           fun=To_apply_parallel_imputations)
 
 ## Save results
-saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/imputed_datasets/List_8_imputed_sets.rds")
+saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/imputed_datasets/List_8_imputed_sets_v2.rds")
 
 ## DESTROY CLUSTER
 stopCluster(Cluster)
