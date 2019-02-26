@@ -19,7 +19,9 @@
 # Imputed trait values (dataframe)
 # OOB errors from the imputations
 
-Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, EV, ErrorTrue, DietTRUE) {
+Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, EV, ErrorTrue, DietTRUE, std) {
+
+  browser()
   
   ## Select traits of interest, to impute, and phylogenetic eigenvectors, and taxinfo 
   To_impute <- TraitDF[, colnames(TraitDF) %in% c(Taxinfo, Traits_cont, Traits_cat, EV)]
@@ -34,7 +36,7 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   
   if(DietTRUE){
     
-    Diet <- c("IN", "VE", "PL", "SE", "NE", "FR", "SCV")
+    Diet <- c("IN", "VE", "PL", "SE", "NE", "FR")
     for (i in Diet) {
       To_impute[,i] <- factor(To_impute[,i], levels=c(0,1))
       
@@ -61,18 +63,31 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   Imputed <- R.Imputed$ximp
   Errors <- R.Imputed$OOBerror
   
-  ## Select traits and variables of interest
-  if(DietTRUE) {
-    Continuous <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", 
-                    "Range_size_m2", "sqrt_Habitat_breadth_IUCN", "sqrt_Diet_breadth")
+  ## Select traits and variables of interest after imputations
   
-    Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level", Diet)
-  }
+  if(DietTRUE) {
+    
+    Continuous <- unique(c(colnames(Imputed[grepl("Body_mass_g", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Longevity_d", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Litter_size", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Range_size_m2", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Habitat_breadth_IUCN", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Diet_breadth", colnames(Imputed))])))
+                            
+    Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level", "Primary_diet", Diet)
+      
+    }
   
   else{
-    Continuous <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", 
-                     "Range_size_m2", "sqrt_Habitat_breadth_IUCN")
-    Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level")}
+    
+    Continuous <- unique(c(colnames(Imputed[grepl("Body_mass_g", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Longevity_d", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Litter_size", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Range_size_m2", colnames(Imputed))]),
+                   colnames(Imputed[grepl("Habitat_breadth_IUCN", colnames(Imputed))])))
+    Categorical <- c(Habitat, "Specialisation", "Diel_activity","Trophic_level")
+    
+    }
   
   Imputed$Best_guess_binomial <- rownames(Imputed)
   Imputed <- Imputed[order(Imputed$Best_guess_binomial), c(Taxinfo, "Best_guess_binomial", Continuous, Categorical, "EV_1")]
@@ -83,6 +98,7 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   Imputed$Phylo_info[is.na(Imputed$Phylo_info)] <- "NO"
   
   ## Add taxonomic information
+  Imputed$Class <- TraitDF$Class
   Imputed$Order <- TraitDF$Order
   Imputed$Family <- TraitDF$Family
   Imputed$Genus <- TraitDF$Genus
@@ -98,28 +114,79 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
       return(paste(ToPaste, collapse = "|"))
     }
     
-    Imputed$Primary_diet <- apply(Imputed[,Diet], 1, Func)
+    # Reprocess primary diet, for comparison with imputed values
+    Imputed$Primary_diet_reprocessed <- apply(Imputed[,Diet], 1, Func)
     
+    # Reprocess diet breadth, for comparison with imputed values
     Imputed[, Diet] <- apply(Imputed[, Diet], 2, as.numeric)
-    Imputed$sqrt_Diet_breadth_reprocessed <- apply(Imputed[, Diet], 1, sum, na.rm=T) %>% sqrt()
-
-    Imputed <- Imputed[, c("Order", "Family", "Genus", "Best_guess_binomial",
-                         "log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size",
-                         "Diel_activity", "Specialisation", 
-                         "Trophic_level", "sqrt_Diet_breadth", "sqrt_Diet_breadth_reprocessed","Primary_diet", Diet,
-                         "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat, "Phylo_info")] 
+    Imputed$Diet_breadth_reprocessed <- apply(Imputed[, Diet], 1, sum, na.rm=T)
+    
+    if(std) {
+      Imputed$Diet_breadth_reprocessed <- sqrt(Imputed$Diet_breadth_reprocessed)
+      Imputed$Diet_breadth_reprocessed <- scale(Imputed$Diet_breadth_reprocessed, center = TRUE, scale = TRUE)
+      colnames(Imputed)[colnames(Imputed)=="Diet_breadth_reprocessed"] <- "sqrt_Diet_breadth_reprocessed"
+    }
+      
+    ## Rearrange columns
+    Imputed <- Imputed[, unique(c("Class","Order", "Family", "Genus", "Best_guess_binomial",
+                           colnames(Imputed[grepl("Body_mass_g", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Longevity_d", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Litter_size", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Range_size_m2", colnames(Imputed))]),
+                           "Diel_activity", 
+                           "Trophic_level", 
+                           colnames(Imputed[grepl("Diet_breadth", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Diet_breadth_reprocessed", colnames(Imputed))]),
+                           "Primary_diet", 
+                           colnames(Imputed[grepl("Primary_diet_reprocessed", colnames(Imputed))]),
+                           Diet,
+                           "Specialisation", 
+                           colnames(Imputed[grepl("Habitat_breadth_IUCN", colnames(Imputed))]),
+                           Habitat,
+                           "Phylo_info"))] 
   
   }
   
-  else{ 
-    
+  else { 
+    Diet <- c("IN", "VE", "PL", "SE", "NE", "FR")
     Imputed$Primary_diet <- NA
-    Imputed$sqrt_Diet_breadth <- NA
+    Imputed$Primary_diet_reprocessed <- NA
+    Imputed$IN <- NA
+    Imputed$VE <- NA
+    Imputed$SE <- NA
+    Imputed$FR <- NA
+    Imputed$NE <- NA
+    Imputed$PL <- NA
     
-    Imputed <- Imputed[, c("Order", "Family", "Genus", "Best_guess_binomial",
-                           "log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size",
-                           "Diel_activity", "Specialisation","Trophic_level", "sqrt_Diet_breadth", "Primary_diet",
-                           "Range_size_m2", "sqrt_Habitat_breadth_IUCN", Habitat, "Phylo_info")]
+    
+    if (std) {
+      Imputed$sqrt_Diet_breadth <- NA
+      Imputed$sqrt_Diet_breadth_reprocessed <- NA
+    } 
+    
+    else{
+      Imputed$Diet_breadth <- NA
+      Imputed$Diet_breadth_reprocessed <- NA
+      }
+ 
+    
+    ## Rearrange columns
+    Imputed <- Imputed[, unique(c("Class","Order", "Family", "Genus", "Best_guess_binomial",
+                           colnames(Imputed[grepl("Body_mass_g", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Longevity_d", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Litter_size", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Range_size_m2", colnames(Imputed))]),
+                           "Diel_activity", 
+                           "Trophic_level", 
+                           colnames(Imputed[grepl("Diet_breadth", colnames(Imputed))]),
+                           colnames(Imputed[grepl("Diet_breadth_reprocessed", colnames(Imputed))]),
+                           "Primary_diet", 
+                           colnames(Imputed[grepl("Primary_diet_reprocessed", colnames(Imputed))]),
+                           Diet,
+                           "Specialisation", 
+                           colnames(Imputed[grepl("Habitat_breadth_IUCN", colnames(Imputed))]),
+                           Habitat,
+                           "Phylo_info"))] 
   }
   
   rownames(Imputed) <- c(1:nrow(Imputed))
@@ -134,7 +201,7 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
 }
 
 
-## Function to apply in parallel (runs the aboce function Imputations_missForest)
+## Function to apply in parallel (runs the above function Imputations_missForest)
 To_apply_parallel_imputations <- function (List_of_arguments) {
 
   ## NB: which function to use here on windows to replace pbmapply (or mapply)?
@@ -147,7 +214,8 @@ To_apply_parallel_imputations <- function (List_of_arguments) {
                           Traits_cat=List_of_arguments[["Traits_cat"]],
                           EV=List_of_arguments[["EV"]],
                           ErrorTrue=List_of_arguments[["ErrorTrue"]],
-                          DietTRUE=List_of_arguments[["DietTRUE"]])
+                          DietTRUE=List_of_arguments[["DietTRUE"]],
+                          std=List_of_arguments[["std"]])
 
   return (Imputations_results)
 }

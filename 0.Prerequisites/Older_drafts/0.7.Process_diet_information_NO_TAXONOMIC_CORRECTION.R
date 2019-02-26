@@ -73,7 +73,6 @@ for (i in 1:nrow(Amphibio)) {
 
 
 colnames(Amphibio)[5] <- "Best_guess_binomial"
-Amphibio$SCV <- NA
 
 #-----------------------------------------------------------------------------
 # # Sekercioglu

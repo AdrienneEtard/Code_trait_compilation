@@ -71,6 +71,7 @@ Species_Intersect <- function(TraitDF, Predicts, Range, Class) {
   return(SpeciesToRemove)
   
 }
+
 # Add family and order to the data
 Add_family_order_genus <- function(TraitDF, SynDF) {
   
@@ -201,7 +202,7 @@ U_Amphibians <- U_Amphibians %>% filter(Best_guess_binomial %nin% U_ToRemoveAmph
 # ExcludedReptiles <- TReptiles$Removed
 
 
-# Add family and order information
+# Add family and order information to corrected datasets
 Mammals <- Add_family_order_genus(Mammals, Syn_Mammals)
 Amphibians <- Add_family_order_genus(Amphibians, Syn_Amphibians)
 Reptiles <- Add_family_order_genus(Reptiles, Syn_Reptiles)
@@ -209,10 +210,10 @@ Birds <- Add_family_order_genus(Birds, Syn_Birds)
 
 
 ## write files
-write.csv(Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Mammals.csv", row.names = FALSE)
-write.csv(Amphibians, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Amphibians.csv", row.names = FALSE)
-write.csv(Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Reptiles.csv", row.names = FALSE)
-write.csv(Birds, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Birds.csv", row.names=FALSE)
+write.csv(Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Mammals.csv", row.names = FALSE)
+write.csv(Amphibians, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Amphibians.csv", row.names = FALSE)
+write.csv(Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Reptiles.csv", row.names = FALSE)
+write.csv(Birds, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Birds.csv", row.names=FALSE)
 
 write.csv(U_Mammals, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/2.filtered/Mammals.csv", row.names = FALSE)
 write.csv(U_Amphibians, "../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/2.filtered/Amphibians.csv", row.names = FALSE)

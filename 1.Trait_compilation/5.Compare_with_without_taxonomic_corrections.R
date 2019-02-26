@@ -11,16 +11,16 @@ source("Comparison_with_without_taxonomic_corrections_functions.R")
 ## Load trait files
 
 # No taxonomic correction
-UN_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv")
-UN_Birds <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv")
-UN_Mammals <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv")
-UN_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv")
+UN_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
+UN_Birds <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Birds.csv")
+UN_Mammals <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
+UN_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
 # With taxonomic correction
-C_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv")
-C_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv")
-C_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv")
-C_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv")
+C_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
+C_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Birds.csv")
+C_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
+C_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
 ## Load PREDICTS
 UN_Predicts <- readRDS("../../Data/PREDICTS_database.rds") %>% 
@@ -63,27 +63,27 @@ ggsave(p, file="../../Results/Plots/Coverage/Phylogenies/Species_representation.
 
 # 2.2. % Trait coverage
 
-TraitsBirds <-  c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
-                  "log10_Litter_size", "Range_size_m2", "Diel_activity", "Primary_diet","Trophic_level","Specialisation",
-                  "sqrt_Habitat_breadth_IUCN")
-
-TraitsMammals <-  c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm",
-                    "log10_Generation_length_d", "log10_Maturity_d", "log10_Longevity_d", "log10_AFR_d",
-                    "log10_Litter_size", "Range_size_m2", "Diel_activity", "Primary_diet","Trophic_level","Specialisation",
-                    "sqrt_Habitat_breadth_IUCN")
-
-TraitsAmphibians <-  c("log10_Body_mass_g", "log10_Body_length_mm","log10_Svl_length_mm", "log10_Maturity_d", "log10_Longevity_d",
-                       "log10_Litter_size", "Range_size_m2", "Diel_activity","Primary_diet", "Trophic_level","Specialisation",
-                       "sqrt_Habitat_breadth_IUCN")
-
-TraitsReptiles <-  c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
-                     "log10_Litter_size", "Range_size_m2", "Diel_activity", "Primary_diet","Trophic_level", "Specialisation",
-                     "sqrt_Habitat_breadth_IUCN")
-
-
-
-# ## Delta in trait coverage before and after taxonomic correction -- FOR ALL TRAITS
+# TraitsBirds <-  c("Body_mass_g", "Adult_svl_cm", "Maturity_d", "Longevity_d",
+#                   "Litter_size", "Range_size_m2", "Diel_activity", "Primary_diet","Trophic_level","Specialisation",
+#                   "Habitat_breadth_IUCN")
 # 
+# TraitsMammals <-  c("Body_mass_g", "Adult_svl_cm", "Forearm_length_mm","Head_length_mm",
+#                     "Generation_length_d", "Maturity_d", "Longevity_d", "AFR_d",
+#                     "Litter_size", "Range_size_m2", "Diel_activity", "Primary_diet","Trophic_level","Specialisation",
+#                     "Habitat_breadth_IUCN")
+# 
+# TraitsAmphibians <-  c("Body_mass_g", "Body_length_mm","Svl_length_mm", "Maturity_d", "Longevity_d",
+#                        "Litter_size", "Range_size_m2", "Diel_activity","Primary_diet", "Trophic_level","Specialisation",
+#                        "Habitat_breadth_IUCN")
+# 
+# TraitsReptiles <-  c("Body_mass_g", "Adult_svl_cm", "Maturity_d", "Longevity_d",
+#                      "Litter_size", "Range_size_m2", "Diel_activity", "Primary_diet","Trophic_level", "Specialisation",
+#                      "Habitat_breadth_IUCN")
+#
+#
+#
+# ## Delta in trait coverage before and after taxonomic correction -- FOR ALL TRAITS
+#
 # # For all species
 # par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(1,2,1,1))
 # par(mfrow=c(2,2))
@@ -91,7 +91,7 @@ TraitsReptiles <-  c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_
 # Plot.Delta.Cov(UN_Birds, C_Birds, TraitsBirds, FALSE, UN_Predicts, C_Predicts, "Birds")
 # Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TraitsReptiles, FALSE, UN_Predicts, C_Predicts, "Reptiles")
 # Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TraitsAmphibians, FALSE, UN_Predicts, C_Predicts, "Amphibians")
-# box("outer")
+# 
 # 
 # ## For PREDICTS species
 # par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(1,2,1,1))
@@ -100,20 +100,20 @@ TraitsReptiles <-  c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_
 # Plot.Delta.Cov(UN_Birds, C_Birds, TraitsBirds, TRUE, UN_Predicts, C_Predicts, "Birds")
 # Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TraitsReptiles, TRUE, UN_Predicts, C_Predicts, "Reptiles")
 # Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TraitsAmphibians, TRUE, UN_Predicts, C_Predicts, "Amphibians")
-# box("outer")
+
 
 
 ## Delta in trait coverage before and after taxonomic correction -- FOR TARGET TRAITS
 
-TargetTraits <- c("log10_Body_mass_g",
-                  "log10_Longevity_d",
-                  "log10_Litter_size", 
+TargetTraits <- c("Body_mass_g",
+                  "Longevity_d",
+                  "Litter_size", 
                   "Range_size_m2", 
                   "Diel_activity",
                   "Trophic_level",
-                  "sqrt_Diet_breadth",
+                  "Diet_breadth",
                   "Specialisation",
-                  "sqrt_Habitat_breadth_IUCN",
+                  "Habitat_breadth_IUCN",
                   "Primary_diet")
 
 # For all species
@@ -125,10 +125,9 @@ Plot.Delta.Cov(UN_Mammals, C_Mammals, TargetTraits, FALSE, UN_Predicts, C_Predic
 Plot.Delta.Cov(UN_Birds, C_Birds, TargetTraits, FALSE, UN_Predicts, C_Predicts, "B. Birds")
 Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TargetTraits, FALSE, UN_Predicts, C_Predicts, "C. Reptiles")
 Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TargetTraits, FALSE, UN_Predicts, C_Predicts, "D. Amphibians")
-box("outer")
 
 mtext(at=50, line=-11, "% coverage", cex=0.8)
-mtext(at=-130, line=-11, "% coverage", cex=0.8)
+mtext(at=-140, line=-11, "% coverage", cex=0.8)
 
 legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
@@ -145,10 +144,9 @@ Plot.Delta.Cov(UN_Mammals, C_Mammals, TargetTraits, TRUE, UN_Predicts, C_Predict
 Plot.Delta.Cov(UN_Birds, C_Birds, TargetTraits, TRUE, UN_Predicts, C_Predicts, "B. PREDICTS birds")
 Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TargetTraits, TRUE, UN_Predicts, C_Predicts, "C. PREDICTS reptiles")
 Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TargetTraits, TRUE, UN_Predicts, C_Predicts, "D. PREDICTS amphibians")
-box("outer")
 
 mtext(at=50, line=-11, "% coverage", cex=0.8)
-mtext(at=-130, line=-11, "% coverage", cex=0.8)
+mtext(at=-140, line=-11, "% coverage", cex=0.8)
 
 legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
@@ -158,29 +156,28 @@ dev.off()
 
 
 
-## Delta in trait coverage before and after taxonomic correction -- FOR TRAITS USED IN MISSFOREST IMPUTATIONS only
+## Delta in trait coverage before and after taxonomic correction -- FOR TRAITS USED IN MISSFOREST IMPUTATIONS only (predictor traits)
 
-Traits_cont <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", "Range_size_m2", "sqrt_Habitat_breadth_IUCN", "sqrt_Diet_breadth")
-Traits_cat <- c("Specialisation", "Diel_activity","Trophic_level")
+Traits_cont <-  c("Body_mass_g", "Longevity_d", "Litter_size", "Range_size_m2", "Habitat_breadth_IUCN", "Diet_breadth")
+Traits_cat <- c("Specialisation", "Diel_activity","Trophic_level", "Primary_diet")
 
-TMammalsI <- c(Traits_cont, Traits_cat, "log10_Generation_length_d", "log10_Adult_svl_cm")
+TMammalsI <- c(Traits_cont, Traits_cat, "Generation_length_d", "Adult_svl_cm")
 TBirdsI <- c(Traits_cont, Traits_cat)
-TReptilesI <- c(Traits_cont, Traits_cat, "log10_Adult_svl_cm", "log10_Maturity_d")
-TAmphibiansI <- c(Traits_cont, Traits_cat, "log10_Body_length_mm")
+TReptilesI <- c(Traits_cont, Traits_cat, "Adult_svl_cm", "Maturity_d")
+TAmphibiansI <- c(Traits_cont, Traits_cat, "Body_length_mm")
 
 # For all species
 
-pdf(file="../../Results/Plots/Coverage/Predictor_traits/All_species.pdf", width=7, height=5.5, family="Times", pointsize=12)
+pdf(file="../../Results/Plots/Coverage/Predictor_traits/All_species.pdf", width=7, height=6, family="Times", pointsize=12)
 par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
 par(mfrow=c(2,2))
 Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, FALSE, UN_Predicts, C_Predicts, "A. Mammals")
 Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, FALSE, UN_Predicts, C_Predicts, "B. Birds")
 Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, FALSE, UN_Predicts, C_Predicts, "C. Reptiles")
 Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, FALSE, UN_Predicts, C_Predicts, "D. Amphibians")
-box("outer")
 
-mtext(at=50, line=-11, "% coverage", cex=0.8)
-mtext(at=-130, line=-11, "% coverage", cex=0.8)
+mtext(at=50, line=-12.5, "% coverage", cex=0.8)
+mtext(at=-140, line=-12.5, "% coverage", cex=0.8)
 
 legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
@@ -189,17 +186,16 @@ dev.off()
 
 
 # For PREDICTS species
-pdf(file="../../Results/Plots/Coverage/Predictor_traits/Predicts.pdf", width=7, height=5.5, family="Times", pointsize=12)
+pdf(file="../../Results/Plots/Coverage/Predictor_traits/Predicts.pdf", width=7, height=6, family="Times", pointsize=12)
 par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
 par(mfrow=c(2,2))
 Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, TRUE, UN_Predicts, C_Predicts, "A. PREDICTS mammals")
 Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, TRUE, UN_Predicts, C_Predicts, "B. PREDICTS birds")
 Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, TRUE, UN_Predicts, C_Predicts, "C. PREDICTS reptiles")
 Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, TRUE, UN_Predicts, C_Predicts, "D. PREDICTS amphibians")
-box("outer")
 
-mtext(at=50, line=-11, "% coverage", cex=0.8)
-mtext(at=-130, line=-11, "% coverage", cex=0.8)
+mtext(at=50, line=-12.5, "% coverage", cex=0.8)
+mtext(at=-140, line=-12.5, "% coverage", cex=0.8)
 
 legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
        legend = c("Without taxonomic correction", "With taxonomic correction"),

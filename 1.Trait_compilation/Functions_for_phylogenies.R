@@ -243,59 +243,99 @@ DropTips <- function(PhylogenyCor, PhylogenyUncor) {
 # }
 
 
-Add_eigenvectors <- function(TraitDF, Phylo, N, TaxInfo) {
+# Add_eigenvectors <- function(TraitDF, Phylo, N, TaxInfo) {
+#   
+#   # N=number of eigenvectors
+#   # Phylo=C_Phylo_Mammals
+#   # TraitDF=C_Mammals
+#   # N=10
+#   
+#   ## Prune species that do not intersect
+#   row.names(TraitDF) <- TraitDF$Best_guess_binomial
+#   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
+#   Phylo <- Prune_Taxa$phy
+#   ToBind1 <- Prune_Taxa$data
+#   
+#   ## Get remaining species, to be binded to species dataset with eigenvectors
+#   Y <- setdiff(TraitDF$Best_guess_binomial, ToBind1$Best_guess_binomial)
+#   ToBind2 <- TraitDF %>% filter(Best_guess_binomial %in% Y)
+# 
+#   if((nrow(ToBind2)+nrow(ToBind1))==nrow(TraitDF)){
+#     
+#     print("Good to start phylogenetic eigenvectors extraction.")
+#   
+#   ## Get phylogenetic eigenvectors from the phylogeny and select N first eigenvectors
+#   print("EIGENVECTOR DECOMPOSITION.")
+#   EigenV <- PVRdecomp(Phylo)
+#   
+#   Eigenvectors <- EigenV@Eigen$vectors
+#   Eigenvectors <- as.data.frame(Eigenvectors)
+#   Eigenvectors <- Eigenvectors[, 1:N]
+#   for (i in 1:10) {colnames(Eigenvectors)[i] <- paste("EV_",i, sep="")} 
+#   
+#   ToBind1 <- cbind(ToBind1, Eigenvectors)
+#   
+#   # Set classes
+#   if(TaxInfo) {
+#     ToCharacter <- c("Order", "Family", "Genus", "Best_guess_binomial", "Diel_activity", "Trophic_level", "Specialisation", "Primary_diet") 
+#   }
+#   
+#   else (ToCharacter <- c("Best_guess_binomial", "Diel_activity", "Trophic_level", "Specialisation", "Primary_diet"))
+#   
+#   ToBind1[, ToCharacter] <- apply(ToBind1[, ToCharacter], 2, as.character)
+#   ToBind2[, ToCharacter] <- apply(ToBind2[, ToCharacter], 2, as.character)
+#   
+#   ToNumeric <- setdiff(colnames(ToBind2), ToCharacter)
+#   ToBind1[, ToNumeric] <- apply(ToBind1[, ToNumeric], 2, as.numeric)
+#   ToBind2[, ToNumeric] <- apply(ToBind2[, ToNumeric], 2, as.numeric)
+#   
+#   FinalDF <- dplyr::bind_rows(ToBind1, ToBind2)
+#   FinalDF <- FinalDF[order(FinalDF$Best_guess_binomial),]
+#   rownames(FinalDF) <- c(1:nrow(FinalDF))
+#   
+#   return(FinalDF)
+#   
+#   } else (print("Manual check for pseudoreplication in phylogenetic tips required."))
+#   
+# }
+
+Extract_eigenvectors <- function(TraitDF, Phylo, N) {
   
-  # N=number of eigenvectors
-  # Phylo=C_Phylo_Mammals
-  # TraitDF=C_Mammals
-  # N=10
+  # N <- number of eigenvectors to extract
   
   ## Prune species that do not intersect
   row.names(TraitDF) <- TraitDF$Best_guess_binomial
   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
   Phylo <- Prune_Taxa$phy
-  ToBind1 <- Prune_Taxa$data
-  
-  ## Get remaining species, to be binded to species dataset with eigenvectors
-  Y <- setdiff(TraitDF$Best_guess_binomial, ToBind1$Best_guess_binomial)
-  ToBind2 <- TraitDF %>% filter(Best_guess_binomial %in% Y)
 
-  if((nrow(ToBind2)+nrow(ToBind1))==nrow(TraitDF)){
-    
-    print("Good to start phylogenetic eigenvectors extraction.")
-  
   ## Get phylogenetic eigenvectors from the phylogeny and select N first eigenvectors
   print("EIGENVECTOR DECOMPOSITION.")
   EigenV <- PVRdecomp(Phylo)
-  
+    
   Eigenvectors <- EigenV@Eigen$vectors
   Eigenvectors <- as.data.frame(Eigenvectors)
   Eigenvectors <- Eigenvectors[, 1:N]
   for (i in 1:10) {colnames(Eigenvectors)[i] <- paste("EV_",i, sep="")} 
+  Eigenvectors$Best_guess_binomial <- Prune_Taxa$data$Best_guess_binomial
+  Eigenvectors <- Eigenvectors[order(Eigenvectors$Best_guess_binomial), c(11, 1:10)]
   
-  ToBind1 <- cbind(ToBind1, Eigenvectors)
+  return(Eigenvectors)
+    
+}
+
+
+Add_eigenvectors <- function (TraitDF, EV) {
   
-  # Set classes
-  if(TaxInfo) {
-    ToCharacter <- c("Order", "Family", "Genus", "Best_guess_binomial", "Diel_activity", "Trophic_level", "Specialisation", "Primary_diet") 
-  }
+  ColN <- vector()
+  for (i in 1:10) {ColN <- c(ColN, paste("EV", i, sep="_")) }
   
-  else (ToCharacter <- c("Best_guess_binomial", "Diel_activity", "Trophic_level", "Specialisation", "Primary_diet"))
+  Species <- as.character(EV$Best_guess_binomial)
+  x <- which(TraitDF$Best_guess_binomial %in% Species)
+  TraitDF[, ColN] <- NA
+  TraitDF[x, ColN] <- EV[, c(2:ncol(EV))]
   
-  ToBind1[, ToCharacter] <- apply(ToBind1[, ToCharacter], 2, as.character)
-  ToBind2[, ToCharacter] <- apply(ToBind2[, ToCharacter], 2, as.character)
-  
-  ToNumeric <- setdiff(colnames(ToBind2), ToCharacter)
-  ToBind1[, ToNumeric] <- apply(ToBind1[, ToNumeric], 2, as.numeric)
-  ToBind2[, ToNumeric] <- apply(ToBind2[, ToNumeric], 2, as.numeric)
-  
-  FinalDF <- dplyr::bind_rows(ToBind1, ToBind2)
-  FinalDF <- FinalDF[order(FinalDF$Best_guess_binomial),]
-  rownames(FinalDF) <- c(1:nrow(FinalDF))
-  
-  return(FinalDF)
-  
-  } else (print("Manual check for pseudoreplication in phylogenetic tips required."))
+  return(TraitDF)
   
 }
+
 

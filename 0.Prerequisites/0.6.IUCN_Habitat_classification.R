@@ -5,43 +5,66 @@
 X <- c("grid", "gridExtra", "ggpubr", "dplyr", "lattice", "stringr")
 invisible(lapply(X, library, character.only=TRUE)); rm(X)
 
-IUCN_mammal <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_mammals.csv")
-IUCN_amphibian <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_amphibians.csv")
-IUCN_bird <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_birds.csv")
-IUCN_reptile <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_reptiles.csv")
+## Data corrected for taxonomy
+IUCN_mammal_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_mammals.csv")
+IUCN_amphibian_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_amphibians.csv")
+IUCN_bird_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_birds.csv")
+IUCN_reptile_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_reptiles.csv")
 
+IUCN_amphibian_C$Best_guess_binomial %<>% as.character()
+IUCN_mammal_C$Best_guess_binomial %<>% as.character()
+IUCN_bird_C$Best_guess_binomial %<>% as.character()
+IUCN_reptile_C$Best_guess_binomial %<>% as.character()
 
-IUCN_amphibian$Best_guess_binomial %<>% as.character()
-IUCN_mammal$Best_guess_binomial %<>% as.character()
-IUCN_bird$Best_guess_binomial %<>% as.character()
-IUCN_reptile$Best_guess_binomial %<>% as.character()
+## Data uncorrected for taxonomy
+IUCN_mammal_UN <- read.csv("../../Data/HabitatData_09_08_18_IUCN_unprocessed/API_HabitatLevel2_Mammals_20180726.csv", sep=",")
+IUCN_amphibian_UN <- read.csv("../../Data/HabitatData_09_08_18_IUCN_unprocessed/API_HabitatLevel2_Amphibians_20180726.csv", sep=",")
+IUCN_bird_UN <- read.csv("../../Data/HabitatData_09_08_18_IUCN_unprocessed/API_HabitatLevel2_Birds_20180726.csv", sep=",")
+IUCN_reptile_UN <- read.csv("../../Data/HabitatData_09_08_18_IUCN_unprocessed/API_HabitatLevel2_Reptiles_20180726.csv", sep=",")
+
+colnames(IUCN_mammal_UN)[7] <- "Best_guess_binomial"
+colnames(IUCN_amphibian_UN)[7] <- "Best_guess_binomial"
+colnames(IUCN_reptile_UN)[7] <- "Best_guess_binomial"
+colnames(IUCN_bird_UN)[7] <- "Best_guess_binomial"
+
+IUCN_amphibian_UN$Best_guess_binomial %<>% as.character()
+IUCN_mammal_UN$Best_guess_binomial %<>% as.character()
+IUCN_bird_UN$Best_guess_binomial %<>% as.character()
+IUCN_reptile_UN$Best_guess_binomial %<>% as.character()
 
 
 # # # # # # # # # # # # # # # # # # # # # #    F U N C T I O N S   # # # # # # # # # # # # # # # # # # # # # # 
 
-## Functions to be ran successively in a script (further down)
-
-
-# Habitat affinity: pooling by "code" using IUCN data, and pooling --------
+## HABITAT AFFINITY: pooling by "code" using IUCN data, and pooling into broader habitat categories
 
 .Set_H_type <- function(IUCN_data) {
   
-  for (i in 1:nrow(IUCN_data)){
-    IUCN_data$Code[i] <- unlist(strsplit(as.character(IUCN_data$code[i]), "[.]"))[1] %>% as.numeric() }
+  Func <- function(X) { 
+    x <- strsplit(as.character(X), "[.]") %>% unlist
+    x <- x[1] %>% as.numeric(); return(x)}
   
-  Types <- c("Forest", "Savanna", "Shrubland", "Grassland", "Wetland", "Rocky areas", "Caves and subterranean", "Desert",
-             rep("Marine", 3), rep("Marine intertidal or coastal/supratidal", 2), rep("Artificial", 2), "Introduced vegetation", rep("Other/Unknown", 2))
+  IUCN_data$Code <- sapply(IUCN_data$code, Func)
   
-  for (i in 1:length(Types)) {
-    if (!is.null(IUCN_data$Code[IUCN_data$Code==i])){
-    IUCN_data$Affinity[IUCN_data$Code==i] <- Types[i]}
-  }
+  IUCN_data <- IUCN_data %>% mutate(Affinity=ifelse(Code==1, "Forest",
+                                                    ifelse(Code==2, "Savanna", 
+                                                           ifelse(Code==3, "Shrubland", 
+                                                                  ifelse(Code==4, "Grassland", 
+                                                                         ifelse(Code==5, "Wetland", 
+                                                                                ifelse(Code==6, "Rocky areas", 
+                                                                                       ifelse(Code==7, "Caves and subterranean", 
+                                                                                              ifelse(Code==8, "Desert", 
+                                                                                                     ifelse(Code==9|Code==10|Code==11, "Marine", 
+                                                                                                            ifelse(Code==12|Code==13, "Marine intertidal or coastal/supratidal", 
+                                                                                                                   ifelse(Code==14|Code==15, "Artificial", 
+                                                                                                                          ifelse(Code==16, "Introduced vegetation", 
+                                                                                                                                 ifelse(Code==17|Code==18, "Other/unknown", NA))))))))))))))
+  
+
   return(IUCN_data)
 } 
 
-
-# Calculating Habitat breadth and degree of specialisation  --------
-# using weights so that suitable habitats count for more
+## HABITAT BREADTH AND DEGREE OF SPECIALISATION
+## using weights so that suitable habitats count for more
 
 IUCN_Habitat_calc <- function(IUCN_Habitat, w_suitable_important, w_suitable, w_marginal, w_unknown) {
 
@@ -72,11 +95,9 @@ for (i in 1:nrow(Species)) {
 return(Species)
 }
 
-
-# Coding habitat affinity as a binary variable ----------------------------
+## HABITAT AFFINITY AS A BINARY VARIABLE
 
 Habitat_as_binary <-  function(Habitat_data, IUCN_data){
-  
   
   Types <- c("Forest", "Savanna", "Shrubland", "Grassland", "Wetland", "Rocky areas", "Caves and subterranean", "Desert",
              "Marine", "Marine intertidal or coastal/supratidal", "Artificial", "Introduced vegetation", "Other/Unknown")
@@ -103,35 +124,60 @@ Habitat_as_binary <-  function(Habitat_data, IUCN_data){
 }
 
 
-
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 # # # # # # # # # # # # # # # # # # # # # # #      R U N S      # # # # # # # # # # # # # # # # # # # # 
 
+## Amphibians
+IUCN_amphibian_C %<>% .Set_H_type() 
+Habitat_amphibian_C <- IUCN_Habitat_calc(IUCN_amphibian_C, 1, 0.8, 0.3, 0.8)
+Habitat_amphibian_C <- Habitat_as_binary(Habitat_amphibian_C, IUCN_amphibian_C)
 
-IUCN_amphibian %<>% .Set_H_type() 
-Habitat_amphibian <- IUCN_Habitat_calc(IUCN_amphibian, 1, 0.8, 0.3, 0.8)
-Habitat_amphibian <- Habitat_as_binary(Habitat_amphibian, IUCN_amphibian)
+IUCN_amphibian_UN %<>% .Set_H_type() 
+Habitat_amphibian_UN <- IUCN_Habitat_calc(IUCN_amphibian_UN, 1, 0.8, 0.3, 0.8)
+Habitat_amphibian_UN <- Habitat_as_binary(Habitat_amphibian_UN, IUCN_amphibian_UN)
 
-IUCN_bird %<>% .Set_H_type()
-Habitat_bird <- IUCN_Habitat_calc(IUCN_bird, 1, 0.8, 0.3, 0.8)
-Habitat_bird <- Habitat_as_binary(Habitat_bird, IUCN_bird)
 
-IUCN_reptile %<>% .Set_H_type()
-Habitat_reptile <- IUCN_Habitat_calc(IUCN_reptile, 1, 0.8, 0.3, 0.8)
-Habitat_reptile <- Habitat_as_binary(Habitat_reptile, IUCN_reptile)
+## Birds
+IUCN_bird_C %<>% .Set_H_type()
+Habitat_bird_C <- IUCN_Habitat_calc(IUCN_bird_C, 1, 0.8, 0.3, 0.8)
+Habitat_bird_C <- Habitat_as_binary(Habitat_bird_C, IUCN_bird_C)
 
-IUCN_mammal %<>% .Set_H_type()
-Habitat_mammal <- IUCN_Habitat_calc(IUCN_mammal, 1, 0.8, 0.3, 0.8)
-Habitat_mammal <- Habitat_as_binary(Habitat_mammal, IUCN_mammal)
+IUCN_bird_UN %<>% .Set_H_type()
+Habitat_bird_UN <- IUCN_Habitat_calc(IUCN_bird_UN, 1, 0.8, 0.3, 0.8)
+Habitat_bird_UN <- Habitat_as_binary(Habitat_bird_UN, IUCN_bird_UN)
+
+
+## Reptiles
+IUCN_reptile_C %<>% .Set_H_type()
+Habitat_reptile_C <- IUCN_Habitat_calc(IUCN_reptile_C, 1, 0.8, 0.3, 0.8)
+Habitat_reptile_C <- Habitat_as_binary(Habitat_reptile_C, IUCN_reptile_C)
+
+IUCN_reptile_UN %<>% .Set_H_type()
+Habitat_reptile_UN <- IUCN_Habitat_calc(IUCN_reptile_UN, 1, 0.8, 0.3, 0.8)
+Habitat_reptile_UN <- Habitat_as_binary(Habitat_reptile_UN, IUCN_reptile_UN)
+
+
+## Mammals
+IUCN_mammal_C %<>% .Set_H_type()
+Habitat_mammal_C <- IUCN_Habitat_calc(IUCN_mammal_C, 1, 0.8, 0.3, 0.8)
+Habitat_mammal_C <- Habitat_as_binary(Habitat_mammal_C, IUCN_mammal_C)
+
+IUCN_mammal_UN %<>% .Set_H_type()
+Habitat_mammal_UN <- IUCN_Habitat_calc(IUCN_mammal_UN, 1, 0.8, 0.3, 0.8)
+Habitat_mammal_UN <- Habitat_as_binary(Habitat_mammal_UN, IUCN_mammal_UN)
+
+
 
 ## Save files
-write.csv(Habitat_amphibian, "../../Results/0.Processed_IUCN_Habitatdata/Amphibians.csv", row.names = FALSE)
-write.csv(Habitat_bird, "../../Results/0.Processed_IUCN_Habitatdata/Birds.csv", row.names = FALSE)
-write.csv(Habitat_reptile, "../../Results/0.Processed_IUCN_Habitatdata/Reptiles.csv", row.names = FALSE)
-write.csv(Habitat_mammal, "../../Results/0.Processed_IUCN_Habitatdata/Mammals.csv", row.names = FALSE)
+write.csv(Habitat_amphibian_C, "../../Results/0.Processed_IUCN_Habitatdata/Amphibians.csv", row.names = FALSE)
+write.csv(Habitat_bird_C, "../../Results/0.Processed_IUCN_Habitatdata/Birds.csv", row.names = FALSE)
+write.csv(Habitat_reptile_C, "../../Results/0.Processed_IUCN_Habitatdata/Reptiles.csv", row.names = FALSE)
+write.csv(Habitat_mammal_C, "../../Results/0.Processed_IUCN_Habitatdata/Mammals.csv", row.names = FALSE)
+
+write.csv(Habitat_amphibian_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Amphibians.csv", row.names = FALSE)
+write.csv(Habitat_bird_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Birds.csv", row.names = FALSE)
+write.csv(Habitat_reptile_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Reptiles.csv", row.names = FALSE)
+write.csv(Habitat_mammal_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Mammals.csv", row.names = FALSE)
+
 
 
 

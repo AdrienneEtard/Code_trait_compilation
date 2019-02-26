@@ -1,4 +1,14 @@
-
+Reprocess_diet <- function(Dataset) {
+  
+  Dataset <- Dataset %>% 
+    mutate(Reprocessed_PD=ifelse(Primary_diet %in% c("PL", "SE", "PL|SE"), 1, 
+                                 ifelse(Primary_diet %in% c("FR", "NE", "NE|FR"), 2, 
+                                        ifelse(Primary_diet %in% c("VE", "SCV", "VE|SCV"), 3, 
+                                               ifelse(Primary_diet %in% c("IN"), 4, 5)))))
+  
+  return(Dataset)
+  
+}
 
 Transform_zscore <- function(TraitDF, Trait, Transf) {
   
@@ -19,12 +29,11 @@ Transform_zscore <- function(TraitDF, Trait, Transf) {
   return(TraitDF)
 }
 
-
 Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, 
                     RC_TraitName, AE_TraitName, Categorical, 
                     Traitaxis, ImputedaxisX, ImputedaxisY, Imputed,
-                    Comparison, CompRC_collected) {
- 
+                    Comparison, CompRC_collected, Diet) {
+
   # Standardise and scale RC data within each class
   if (RC_TraitName %in% c("body_mass_median", "litter_clutch_size")){
     RC_Birds <- subset(RC_data, class=="Aves")
@@ -195,6 +204,14 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed,
     
     Outcome <- AE_data$Best_guess_binomial %>% as.data.frame()
     
+    if(Diet) {
+      x1 <- AE_data[,c("Best_guess_binomial",AE_TraitName)]
+      x2 <- RC_data[, c("binomial",RC_TraitName)]
+      xreturn <- cbind(x1,x2)
+      xreturn <- xreturn %>%
+        filter(Reprocessed_PD!=diet_5cat)
+    }
+    
     for (i in 1:nrow(AE_data)){
       
       x <- AE_data[i, AE_TraitName]
@@ -227,11 +244,10 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed,
       xlab(paste(Traitaxis, ImputedaxisX, sep = ", ")) + ylab("% species") +
       scale_x_discrete(limits=c("different", "unknown", "same"), labels=c("Contradicting", "Unkown", "Similar"))
     
-    return(p)
+    if(Diet) {return(list(p=p, outputs=xreturn))}
+    else{return(p)}
   }
 }
-
-
 
 Plot.Cov <- function(TraitData, Traits, Main) {
   
@@ -258,6 +274,7 @@ Plot.Cov <- function(TraitData, Traits, Main) {
   
   abline(v=100, lty="dotted")
 }
+
 
 
 

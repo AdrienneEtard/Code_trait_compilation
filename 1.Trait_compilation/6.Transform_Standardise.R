@@ -1,8 +1,8 @@
-## Clean and standardise compiled datasets before imputations.
-# rearrange columns
-# merge longevity and max longevity columns
-# standardise traits (log10 and sqrt transformations plus z-scoring)
+## Transform and standardise compiled datasets before imputations.
+# standardise traits (log10 and sqrt transformations, and z-scoring)
 
+# Only for corrected datasets as they will be the ones imputed on. 
+# The imputations will be run on both standardised and non standardised traits in two different sets, to compare.
 
 # # PREAMBLE
 
@@ -12,51 +12,31 @@ lapply(X, library, character.only=TRUE); rm(X)
 Transform_zscore <- function(TraitDF, Trait, Transf) {
   
   if (Transf=="log10"){
-    TraitDF[,paste("log10", Trait, sep="_")] <- log10(TraitDF[,Trait])
+    TraitDF[,paste("log10", Trait, sep="_")] <- as.numeric(log10(TraitDF[,Trait]))
     TraitDF[, paste("log10", Trait, sep="_")] <- scale(TraitDF[, paste("log10", Trait, sep="_")], center=TRUE, scale=TRUE)
+    TraitDF[, paste("log10", Trait, sep="_")] <- as.numeric(TraitDF[, paste("log10", Trait, sep="_")])
   }
   
   if(Transf=="sqrt") {
-    TraitDF[,Trait]  <- sqrt(TraitDF[,Trait])
+    TraitDF[,Trait]  <- as.numeric(sqrt(TraitDF[,Trait]))
     TraitDF[, paste("sqrt", Trait, sep="_")] <- scale(TraitDF[,Trait] , center=TRUE, scale=TRUE)
+    TraitDF[, paste("sqrt", Trait, sep="_")] <- as.numeric(TraitDF[, paste("sqrt", Trait, sep="_")])
+    
   }
   
   return(TraitDF)
 }
 
 ## Load trait data 
-Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Mammals.csv")
-Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Birds.csv")
-Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Amphibians.csv")
-Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered_taxinfo/All/Reptiles.csv")
-Reptiles$Maturity_d[Reptiles$Maturity_d==0] <- NA
+Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
+Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Birds.csv")
+Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
+Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
 ## Predicts
 PredictsVertebrates <- readRDS("../../Results/0.Data_resolved_taxonomy/Processed_datasets/PredictsVertebrates.rds")
 
-# # # #
-
-
-## Transforming and standardising traits
-
-# 1. Merging together maturity and generation length, and longevity and max longevity
-
-# Reptiles
-Reptiles$Longevity_d <- apply(Reptiles[, c("Longevity_d","Max_longevity_d")], 1, mean, na.rm=TRUE)
-Reptiles %<>% select(-Max_longevity_d)
-
-# Amphibians
-colnames(Amphibians)[7] <- c("Longevity_d")
-
-# Birds
-Birds$Longevity_d <- apply(Birds[, c("Max_longevity_d","Longevity_d")], 1, mean, na.rm=TRUE)
-Birds %<>% select(-Max_longevity_d)
-
-# Mammals
-Mammals$Longevity_d <- apply(Mammals[, c("Max_longevity_d","Longevity_d")], 1, mean, na.rm=TRUE)
-Mammals %<>% select(-Max_longevity_d)
-
-# 2. Standardising traits
+## Standardising traits
 
 # Mammals
 Mammals <- Transform_zscore(Mammals, "Body_mass_g", "log10")
@@ -100,40 +80,42 @@ Amphibians <- Transform_zscore(Amphibians, "Diet_breadth", "sqrt")
 
 
 ## Reorganising columns
-Diet <- c("IN", "VE", "PL", "SE", "NE", "FR", "SCV")
+Diet <- c("IN", "VE", "PL", "SE", "NE", "FR")
 Habitat <- c("Forest","Savanna","Shrubland","Grassland","Wetland","Rocky.areas",
              "Caves.and.subterranean","Desert","Marine","Marine.intertidal.or.coastal.supratidal",
              "Artificial","Introduced.vegetation","Other.Unknown")
+Ev <- vector()
+for (i in 1:10) {Ev <- c(Ev, paste("EV", i, sep="_")) }
 
-Reptiles[, (ncol(Reptiles)+1):(ncol(Reptiles)+2)] <- NA
-colnames(Reptiles)[c(34,35)] <- c("Primary_diet", "sqrt_Diet_breadth")
-
-Reptiles <- Reptiles[, c("Order", "Family", "Genus", "Best_guess_binomial",
+Reptiles$sqrt_Diet_breadth <- NA
+Reptiles <- Reptiles[, c("Class", "Order", "Family", "Genus", "Best_guess_binomial",
                          "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
                          "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth", "Primary_diet", "Specialisation",
-                         "sqrt_Habitat_breadth_IUCN", Habitat)]
+                         "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 
-Amphibians <- Amphibians[, c("Order", "Family", "Genus", "Best_guess_binomial",
+Amphibians <- Amphibians[, c("Class", "Order", "Family", "Genus", "Best_guess_binomial",
                          "log10_Body_mass_g", "log10_Body_length_mm","log10_Svl_length_mm", "log10_Maturity_d", "log10_Longevity_d",
                          "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth", "Primary_diet",  Diet,"Specialisation",
-                         "sqrt_Habitat_breadth_IUCN", Habitat)]
+                         "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 
-Birds <- Birds[, c("Order", "Family", "Genus", "Best_guess_binomial",
+Birds <- Birds[, c("Class", "Order", "Family", "Genus", "Best_guess_binomial",
                              "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
                              "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth","Primary_diet",Diet,"Specialisation",
-                             "sqrt_Habitat_breadth_IUCN", Habitat)]
+                             "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 
 
-Mammals <- Mammals[, c("Order", "Family", "Genus", "Best_guess_binomial",
+Mammals <- Mammals[, c("Class", "Order", "Family", "Genus", "Best_guess_binomial",
                    "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm",
                    "log10_Generation_length_d","log10_Maturity_d", "log10_Longevity_d", "log10_AFR_d",
                    "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth", "Primary_diet", Diet, "Specialisation",
-                   "sqrt_Habitat_breadth_IUCN", Habitat)]
+                   "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 
+
+glimpse(Mammals)
 
 # Saving results
-write.csv(Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Reptiles.csv", row.names=FALSE)
-write.csv(Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Mammals.csv", row.names=FALSE)
-write.csv(Birds, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Birds.csv", row.names=FALSE)
-write.csv(Amphibians, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Amphibians.csv", row.names=FALSE)
+write.csv(Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Reptiles.csv", row.names=FALSE)
+write.csv(Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Mammals.csv", row.names=FALSE)
+write.csv(Birds, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Birds.csv", row.names=FALSE)
+write.csv(Amphibians, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Amphibians.csv", row.names=FALSE)
 

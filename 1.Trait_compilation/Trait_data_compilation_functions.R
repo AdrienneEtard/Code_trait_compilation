@@ -17,15 +17,14 @@
   
   
   # Diet variables
-  Diet <- c("FR", "NE", "SE", "PL", "IN", "VE", "SCV")
+  Diet <- c("FR", "NE", "SE", "PL", "IN", "VE")
   
   # Kissling
   colnames(Kissling)[22] <- "Trophic_level"
   Kissling$Trophic_level %<>% as.character()
-  Kissling <- Kissling %>% mutate(Trophic_level=ifelse(Trophic_level=="NotAssigned", NA, Trophic_level))
-  
+
   # Elton (Kissling replaced by Elton trait for mammalian diet)
-  colnames(Elton_MD)[24] <- "Body_mass_g"
+  colnames(Elton_MD)[14] <- "Body_mass_g"
   Elton_MD$Primary_diet %<>% as.character()
   Elton_MD <- Elton_MD %>%
     mutate(Diel_activity=ifelse(Activity.Nocturnal==1,"Nocturnal","Other"))
@@ -78,7 +77,7 @@
     mutate(Diel_activity=ifelse((Noc==1 & is.na(Diu) & is.na(Crepu)), "Nocturnal", Diel_activity))
   Amphibio$Primary_diet %<>% as.character()
   
-  colnames(Amphibio)[c(30, 33)] <- c("Body_length_mm", "Max_longevity_d")
+  colnames(Amphibio)[c(26, 29)] <- c("Body_length_mm", "Max_longevity_d")
   Amphibio %<>% select(-id)
   Amphibio$Maturity_d <- apply(Amphibio[, c("Age_at_maturity_min_y", "Age_at_maturity_min_y")], 1, mean, na.rm=T) * 365.25
   Amphibio$Max_longevity_d <- Amphibio$Max_longevity_d * 365.25
@@ -169,7 +168,7 @@
  # Traits.Sekercioglu <- c(Diet, "Diet_breadth", "Trophic_level")
   
   # Elton bird diet
-  colnames(Elton_BD)[36] <- "Body_mass_g"
+  colnames(Elton_BD)[26] <- "Body_mass_g"
   Elton_BD$Primary_diet %<>% as.character()
   Elton_BD <- Elton_BD %>%
     mutate(Diel_activity=ifelse(Nocturnal==1,"Nocturnal","Other"))
@@ -315,8 +314,6 @@
              ifelse(length(unique(IN))==1, unique(IN), unique(IN[!is.na(IN)]))) %>%
     mutate(VE=
              ifelse(length(unique(VE))==1, unique(VE), unique(VE[!is.na(VE)]))) %>%
-    mutate(SCV=
-              ifelse(length(unique(SCV))==1, unique(SCV), unique(SCV[!is.na(SCV)]))) %>%
     mutate(FR=
              ifelse(length(unique(FR))==1, unique(FR), unique(FR[!is.na(FR)]))) %>%
     mutate(NE=

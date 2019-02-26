@@ -13,13 +13,17 @@ Delta_Number <- function(NotCorrected, Corrected, Class, All_or_Predicts, C_Pred
     
     C_Sp <- unique(C_Predictsdata$Best_guess_binomial[C_Predictsdata$Class==Class])
     Corrected <- Corrected %>% filter(Best_guess_binomial %in% C_Sp)
+    Corrected <- Corrected$Best_guess_binomial
     
     UN_Sp <- unique(UN_Predictsdata$Best_guess_binomial[UN_Predictsdata$Class==Class])
     NotCorrected <- NotCorrected %>% filter(Best_guess_binomial %in% UN_Sp)
+    NotCorrected <- NotCorrected$Best_guess_binomial
     
-    print(paste("Not corrected:", length(unique(NotCorrected$Best_guess_binomial)), "species for", All_or_Predicts, Class))
-    print(paste("Corrected:", length(unique(Corrected$Best_guess_binomial)), "species for", All_or_Predicts, Class))
-    print(paste("Correcting reduced species redundancy by:", length(unique(NotCorrected$Best_guess_binomial))- length(unique(Corrected$Best_guess_binomial)), "species" ))
+    print(paste("Not corrected:", length(UN_Sp), "species for", All_or_Predicts, Class))
+    print(paste("Corrected:", length(C_Sp), "species for", All_or_Predicts, Class))
+    print(paste("Correcting reduced species redundancy by:", length(UN_Sp)- length(C_Sp), "species" ))
+    print(paste("Corrected:", length(Corrected), "species intersect"))
+    print(paste("Uncorrected:", length(NotCorrected), "species intersect"))
     
   }
   
@@ -172,9 +176,9 @@ Plot.Cov <- function(TraitData, Traits, Main, PredictsTrue, Predicts) {
     
   }
   
-  Names <- as.data.frame(c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm","log10_Body_length_mm",
-                           "log10_Svl_length_mm","log10_Generation_length_d", "log10_Longevity_d", "log10_Maturity_d", "log10_AFR_d",
-                           "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","sqrt_Diet_breadth", "Specialisation","sqrt_Habitat_breadth_IUCN", "EV_1"))
+  Names <- as.data.frame(c("Body_mass_g", "Adult_svl_cm", "Forearm_length_mm","Head_length_mm","Body_length_mm",
+                           "Svl_length_mm","Generation_length_d", "Longevity_d", "Maturity_d", "AFR_d",
+                           "Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","Diet_breadth", "Specialisation","Habitat_breadth_IUCN", "EV_1"))
   colnames(Names) <- "Original"
   Names$FP <- c("Body mass", "Svl length", "Forearm length", "Head length", "Body length", "Svl length", "Generation length", "Longevity", "Sexual maturity age",
                 "Age 1st reproduction","Litter/clutch size", "Range size",
@@ -228,9 +232,9 @@ Plot.Delta.Cov <- function(TraitData1, TraitData2, Traits_name, PredictsTrue, Pr
     print(paste("Predicts uncorrected:", length(SpUN), "species"))
   }
   
-  Names <- c("log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Forearm_length_mm","log10_Head_length_mm","log10_Body_length_mm",
-             "log10_Svl_length_mm","log10_Generation_length_d", "log10_Longevity_d", "log10_Maturity_d", "log10_AFR_d",
-             "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","sqrt_Diet_breadth","Primary_diet","Specialisation","sqrt_Habitat_breadth_IUCN") %>%
+  Names <- c("Body_mass_g", "Adult_svl_cm", "Forearm_length_mm","Head_length_mm","Body_length_mm",
+             "Svl_length_mm","Generation_length_d", "Longevity_d", "Maturity_d", "AFR_d",
+             "Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level","Diet_breadth","Primary_diet","Specialisation","Habitat_breadth_IUCN") %>%
     as.data.frame() %>%
     setNames(., "Original")
   
@@ -266,6 +270,7 @@ Plot.Delta.Cov <- function(TraitData1, TraitData2, Traits_name, PredictsTrue, Pr
   title(main=Main, adj=0)
   
   abline(v=100, lty="dotted")
+
   
 }
 
