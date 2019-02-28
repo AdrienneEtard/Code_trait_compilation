@@ -116,6 +116,7 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
     
     # Reprocess primary diet, for comparison with imputed values
     Imputed$Primary_diet_reprocessed <- apply(Imputed[,Diet], 1, Func)
+    # Imputed$Primary_diet_reprocessed[Imputed$Primary_diet_reprocessed==""] <- "OM"
     
     # Reprocess diet breadth, for comparison with imputed values
     Imputed[, Diet] <- apply(Imputed[, Diet], 2, as.numeric)

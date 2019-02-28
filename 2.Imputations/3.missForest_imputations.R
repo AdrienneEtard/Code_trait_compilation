@@ -41,7 +41,7 @@ Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic
 Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
 
-# # for quickly testing code
+# # # for quickly testing code
 # Mammals_st <- Mammals_st[c(1:15),]
 # Birds_st <- Birds_st[c(1:15),]
 # Amphibians_st <- Amphibians_st[c(1:15),]
@@ -140,16 +140,18 @@ clusterExport(cl=Cluster, list("Imputations_missForest",
               envir=environment())
 
 ## Parallel imputations on 8 cores
-system.time(Imputed_sets_st <- parLapply(cl=Cluster,
-                          X=To_impute_parallel_st,
-                          fun=To_apply_parallel_imputations))
+# print("Imputations on tranformed and standardised data")
+# system.time(Imputed_sets_st <- parLapply(cl=Cluster,
+#                           X=To_impute_parallel_st,
+#                           fun=To_apply_parallel_imputations))
 
+print("Imputations on non-tranformed/standardised data")
 system.time(Imputed_sets <- parLapply(cl=Cluster,
                              X=To_impute_parallel,
                              fun=To_apply_parallel_imputations))
 
 ## Save results
-saveRDS(Imputed_sets_st, "../../Results/2.imputed_trait_datasets/Imputed_on_standardised/List_of_8_sets.rds")
+# saveRDS(Imputed_sets_st, "../../Results/2.imputed_trait_datasets/Imputed_on_standardised/List_of_8_sets.rds")
 saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/Imputed_not_standardised/List_of_8_sets.rds")
 
 ## DESTROY CLUSTER

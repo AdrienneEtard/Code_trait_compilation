@@ -119,19 +119,20 @@ TargetTraits <- c("Body_mass_g",
 # For all species
 
 pdf(file="../../Results/Plots/Coverage/Target_traits/All_species.pdf", width=7, height=5.5, family="Times", pointsize=12)
-par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
+par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(7,2,1,1))
 par(mfrow=c(2,2))
-Plot.Delta.Cov(UN_Mammals, C_Mammals, TargetTraits, FALSE, UN_Predicts, C_Predicts, "A. Mammals")
-Plot.Delta.Cov(UN_Birds, C_Birds, TargetTraits, FALSE, UN_Predicts, C_Predicts, "B. Birds")
-Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TargetTraits, FALSE, UN_Predicts, C_Predicts, "C. Reptiles")
-Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TargetTraits, FALSE, UN_Predicts, C_Predicts, "D. Amphibians")
+Plot.Delta.Cov(UN_Mammals, C_Mammals, TargetTraits, FALSE, UN_Predicts, C_Predicts, "A")
+Plot.Delta.Cov(UN_Birds, C_Birds, TargetTraits, FALSE, UN_Predicts, C_Predicts, "B")
+Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TargetTraits, FALSE, UN_Predicts, C_Predicts, "C")
+Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TargetTraits, FALSE, UN_Predicts, C_Predicts, "D")
 
 mtext(at=50, line=-11, "% coverage", cex=0.8)
 mtext(at=-140, line=-11, "% coverage", cex=0.8)
 
-legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
+par(xpd=NA)
+legend(x=-110, y=-6, title="Trait coverage",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
-       fill = c("lightgrey", "deepskyblue3"),  box.lty=0)
+       fill = c("#F8766D", "#00BFC4"),  bty="n")
 
 dev.off()
 
@@ -140,17 +141,18 @@ dev.off()
 pdf(file="../../Results/Plots/Coverage/Target_traits/Predicts.pdf", width=7, height=5.5, family="Times", pointsize=12)
 par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
 par(mfrow=c(2,2))
-Plot.Delta.Cov(UN_Mammals, C_Mammals, TargetTraits, TRUE, UN_Predicts, C_Predicts, "A. PREDICTS mammals")
-Plot.Delta.Cov(UN_Birds, C_Birds, TargetTraits, TRUE, UN_Predicts, C_Predicts, "B. PREDICTS birds")
-Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TargetTraits, TRUE, UN_Predicts, C_Predicts, "C. PREDICTS reptiles")
-Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TargetTraits, TRUE, UN_Predicts, C_Predicts, "D. PREDICTS amphibians")
+Plot.Delta.Cov(UN_Mammals, C_Mammals, TargetTraits, TRUE, UN_Predicts, C_Predicts, "A")
+Plot.Delta.Cov(UN_Birds, C_Birds, TargetTraits, TRUE, UN_Predicts, C_Predicts, "B")
+Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TargetTraits, TRUE, UN_Predicts, C_Predicts, "C")
+Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TargetTraits, TRUE, UN_Predicts, C_Predicts, "D")
 
 mtext(at=50, line=-11, "% coverage", cex=0.8)
 mtext(at=-140, line=-11, "% coverage", cex=0.8)
 
-legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
+par(xpd=NA)
+legend(x=-110, y=-6, title="Trait coverage",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
-       fill = c("lightgrey", "deepskyblue3"),  box.lty=0)
+       fill = c("#F8766D", "#00BFC4"),  bty="n")
 
 dev.off()
 
@@ -171,17 +173,18 @@ TAmphibiansI <- c(Traits_cont, Traits_cat, "Body_length_mm")
 pdf(file="../../Results/Plots/Coverage/Predictor_traits/All_species.pdf", width=7, height=6, family="Times", pointsize=12)
 par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
 par(mfrow=c(2,2))
-Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, FALSE, UN_Predicts, C_Predicts, "A. Mammals")
-Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, FALSE, UN_Predicts, C_Predicts, "B. Birds")
-Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, FALSE, UN_Predicts, C_Predicts, "C. Reptiles")
-Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, FALSE, UN_Predicts, C_Predicts, "D. Amphibians")
+Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, FALSE, UN_Predicts, C_Predicts, "A")
+Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, FALSE, UN_Predicts, C_Predicts, "B")
+Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, FALSE, UN_Predicts, C_Predicts, "C")
+Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, FALSE, UN_Predicts, C_Predicts, "D")
 
 mtext(at=50, line=-12.5, "% coverage", cex=0.8)
 mtext(at=-140, line=-12.5, "% coverage", cex=0.8)
 
-legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
+par(xpd=NA)
+legend(x=-110, y=-6, title="Trait coverage",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
-       fill = c("lightgrey", "deepskyblue3"),  box.lty=0)
+       fill = c("#F8766D", "#00BFC4"), bty="n")
 dev.off()
 
 
@@ -189,17 +192,18 @@ dev.off()
 pdf(file="../../Results/Plots/Coverage/Predictor_traits/Predicts.pdf", width=7, height=6, family="Times", pointsize=12)
 par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
 par(mfrow=c(2,2))
-Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, TRUE, UN_Predicts, C_Predicts, "A. PREDICTS mammals")
-Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, TRUE, UN_Predicts, C_Predicts, "B. PREDICTS birds")
-Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, TRUE, UN_Predicts, C_Predicts, "C. PREDICTS reptiles")
-Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, TRUE, UN_Predicts, C_Predicts, "D. PREDICTS amphibians")
+Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, TRUE, UN_Predicts, C_Predicts, "A")
+Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, TRUE, UN_Predicts, C_Predicts, "B")
+Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, TRUE, UN_Predicts, C_Predicts, "C")
+Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, TRUE, UN_Predicts, C_Predicts, "D")
 
 mtext(at=50, line=-12.5, "% coverage", cex=0.8)
 mtext(at=-140, line=-12.5, "% coverage", cex=0.8)
 
-legend(x=-110, y=-6, xpd="NA", title="Trait coverage across all species",
+par(xpd=NA)
+legend(x=-110, y=-6, title="Trait coverage",
        legend = c("Without taxonomic correction", "With taxonomic correction"),
-       fill = c("lightgrey", "deepskyblue3"),  box.lty=0)
+       fill = c("#F8766D", "#00BFC4"),  bty="n")
 dev.off()
 
 

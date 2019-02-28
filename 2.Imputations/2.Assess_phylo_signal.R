@@ -12,6 +12,8 @@ Cluster <- makeCluster(detectCores())
 clusterEvalQ(Cluster, {
   library(dplyr)
   library(phytools)
+  library(picante)
+  library(geiger)
   })
 
 ## Preamble
@@ -33,6 +35,10 @@ PhySignal <- function(Traitdata, Names, Phylo) {
 # Function to apply for categorical traits: PhySignal_Cat 
 # TODO
 PhySignal_Cat <- function(Traitdata, Names, Phylo) {
+  
+  # Traitdata=Mammals[,"Trophic_level"] %>% as.vector()
+  # Names=Mammals$Best_guess_binomial
+  # Phylo=Phylo_Mammals
   
   ## For the current trait, match and prune phylogeny
   names(Traitdata) <- Names
@@ -87,8 +93,7 @@ PhySignal_Cat <- function(Traitdata, Names, Phylo) {
 
     if (p<0.05) {
         cat("Model significantly different from null")
-        } 
-    else (cat("Model not significantly different from null"))
+    } else {cat("Model not significantly different from null")}
 
     Signal <- Lambda_trait$opt$lambda
 
@@ -98,10 +103,10 @@ PhySignal_Cat <- function(Traitdata, Names, Phylo) {
 
 
 # Read trait data
-Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Mammals.csv")
-Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Birds.csv")
-Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Amphibians.csv")
-Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.with_phylo_eigenvectors/Reptiles.csv")
+Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
+Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Birds.csv")
+Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
+Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
 # Load phylogenies
 Phylo_Mammals <- read.newick("../../Results/1.Phylogenies/Corrected/2.Dropped_tips/Mammals.nwk") %>% .Format_tiplabels() %>% compute.brlen()
@@ -110,16 +115,17 @@ Phylo_Reptiles <- read.newick("../../Results/1.Phylogenies/Corrected/2.Dropped_t
 Phylo_Birds <- read.newick("../../Results/1.Phylogenies/Corrected/2.Dropped_tips/Birds.nwk") %>% .Format_tiplabels()  %>% compute.brlen()
 
 # Traits
-Continuous.Traits <- c("log10_Body_mass_g",
-                       "log10_Longevity_d",
-                       "log10_Litter_size", 
-                       "sqrt_Diet_breadth",
+Continuous.Traits <- c("Body_mass_g",
+                       "Longevity_d",
+                       "Litter_size", 
+                       "Diet_breadth",
                        "Range_size_m2", 
-                       "sqrt_Habitat_breadth_IUCN")
+                       "Habitat_breadth_IUCN")
 
 Categorical.Traits <- c("Specialisation",
                         "Trophic_level",
-                        "Diel_activity") # ? Primary diet
+                        "Diel_activity",
+                        "Primary_diet")
 
 # Names
 Names.Mammals <- Mammals$Best_guess_binomial

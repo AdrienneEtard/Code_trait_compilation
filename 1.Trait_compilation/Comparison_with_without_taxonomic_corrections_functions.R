@@ -135,7 +135,7 @@ PlotPhyloCov <- function(Cor, Uncor, FontSize) {
     geom_hline(yintercept = 100, linetype="dashed") +
     coord_flip() +
     scale_fill_discrete(name = "Taxonomic correction") +
-    scale_fill_manual(name="Taxonomy", labels = c("Corrected", "Uncorrected"), values = c("firebrick", "royalblue"))
+    scale_fill_hue(name="Taxonomy", labels = c("Corrected", "Uncorrected")) #, values = c("firebrick", "royalblue")
     #labs(tag = "A") + theme(plot.tag.position = c(0.13,0.97))
     
   
@@ -146,7 +146,7 @@ PlotPhyloCov <- function(Cor, Uncor, FontSize) {
     theme_classic() + GGPoptions + 
     geom_hline(yintercept = 100, linetype="dashed") +
     coord_flip() +
-    scale_fill_manual(name="Taxonomy", labels = c("Corrected", "Uncorrected"), values = c("firebrick", "royalblue"))+
+    scale_fill_hue(name="Taxonomy", labels = c("Corrected", "Uncorrected"))+ #values = c("firebrick", "royalblue")
     guides(fill=FALSE) + xlab("") + ylab("") 
     #labs(tag = "B")  + 
     #theme(plot.tag.position = c(0.13,0.97))
@@ -206,7 +206,7 @@ Plot.Cov <- function(TraitData, Traits, Main, PredictsTrue, Predicts) {
   for (i in 1:nrow(Names_plot)) {Names_plot$TP[i] <- Names$FP[Names$Original==Names_plot$Or[i]]}
   
   barplot(Completeness$Completeness, horiz = TRUE, 
-          xlim = c(0,100), las=1,col="deepskyblue3", main = Main, names.arg = Names_plot$TP)
+          xlim = c(0,100), las=1,col="#00BFC4", main = Main, names.arg = Names_plot$TP)
   
   
   abline(v=100, lty="dotted")
@@ -264,9 +264,9 @@ Plot.Delta.Cov <- function(TraitData1, TraitData2, Traits_name, PredictsTrue, Pr
   }
   
   barplot(Completeness2$Completeness, horiz = TRUE, 
-          xlim = c(0,100), names.arg=BarplotArg2, las=1, col="deepskyblue3")
+          xlim = c(0,100), names.arg=BarplotArg2, las=1, col="#00BFC4")
   
-  barplot(Completeness1$Completeness, horiz=TRUE, add=T, las=1, col="lightgrey")
+  barplot(Completeness1$Completeness, horiz=TRUE, add=T, las=1, col="#F8766D")
   title(main=Main, adj=0)
   
   abline(v=100, lty="dotted")

@@ -111,8 +111,6 @@ Mammals <- Mammals[, c("Class", "Order", "Family", "Genus", "Best_guess_binomial
                    "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 
 
-glimpse(Mammals)
-
 # Saving results
 write.csv(Reptiles, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Reptiles.csv", row.names=FALSE)
 write.csv(Mammals, "../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Mammals.csv", row.names=FALSE)
