@@ -1,19 +1,19 @@
+## Reprocess diet variables into 1 to 5
 Reprocess_diet <- function(Dataset) {
-
+  
   Dataset <- Dataset %>%
     mutate(Primary_diet=ifelse(Primary_diet %in% c("PL|SE"), 1,
-                                 ifelse(Primary_diet %in% c("FR|NE"), 2,
-                                        ifelse(Primary_diet %in% "VE", 3,
-                                               ifelse(Primary_diet %in% "IN", 4, 
-                                                      ifelse(Primary_diet %in% "OM", 5, NA)))))) %>%
+                               ifelse(Primary_diet %in% c("FR|NE"), 2,
+                                      ifelse(Primary_diet %in% "VE", 3,
+                                             ifelse(Primary_diet %in% "IN", 4, 
+                                                    ifelse(Primary_diet %in% "OM", 5, NA)))))) %>%
     mutate(Primary_diet=as.character(Primary_diet))
-
+  
   return(Dataset)
-
+  
 }
 
-
-
+## Function  to compare RC data to mine: either both collected; both imputed; or imputed VS collected.
 Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
                     TraitName, Categorical, 
                     Traitaxis, ImputedaxisX, ImputedaxisY,
@@ -21,7 +21,7 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
   
   
   if(Imputed) {
-
+    
     
     # Filter species for which the trait value was imputed
     
@@ -67,10 +67,10 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
         
         AE_data <- AE_imputed %>% filter(Best_guess_binomial %in% Sp)
         AE_data <- AE_data[, c("Class","Best_guess_binomial",TraitName)]
-
+        
         ImputedaxisX <- "imputed"
         ImputedaxisY <- "collected"
-        }
+      }
       
     }
     
@@ -95,7 +95,7 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
         ImputedaxisY <- "imputed"
       }
       
-      }
+    }
   }
   
   
@@ -123,21 +123,20 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
     # Xp <- max(ToPlot$AE, na.rm=TRUE)*(3/4)  
     # Yp <- max(ToPlot$RC, na.rm=TRUE)*(1/10)  
     
-      p <- ggplot(ToPlot, aes(AE, RC, color=ToPlot$class)) +
-        GGPoptions +
-        geom_point(alpha=0.7) +
-        geom_abline(slope = 1, intercept = 0, alpha=0.8) +
-        xlab(paste(Traitaxis, "(", ImputedaxisX," by AE)", sep="")) + 
-        ylab(paste(Traitaxis,  "(", ImputedaxisY," by RC)", sep="")) + 
-        scale_color_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f")) 
-        # annotate("text", x=Xp,y=Yp, label = Ssize)
-      
-      return(p)
+    p <- ggplot(ToPlot, aes(AE, RC, color=ToPlot$class)) +
+      GGPoptions +
+      geom_point(alpha=0.7) +
+      geom_abline(slope = 1, intercept = 0, alpha=0.8) +
+      xlab(paste(Traitaxis, "(", ImputedaxisX," by AE)", sep="")) + 
+      ylab(paste(Traitaxis,  "(", ImputedaxisY," by RC)", sep="")) + 
+      scale_color_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f")) 
+    
+    return(p)
     
   }
   
   if(Categorical) {
-
+    
     
     Outcome <- AE_data[, c("Class", "Best_guess_binomial")]
     
@@ -164,17 +163,14 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
       }
     }
     
+    
+    
     ToPlot <-  with(Outcome, table(Result, Class)) %>%
       as.data.frame() %>%
       group_by(Class) %>%
-      mutate(Freq=Freq/sum(Freq)*100) %>%
-      setNames(., c("outcome", "class", "prop")) %>%
+      mutate(prop=Freq/sum(Freq)*100) %>%
+      setNames(., c("outcome", "class", "freq","prop")) %>%
       as.data.frame()
-    
-    # ToPlot <- table(ToPlot) %>% 
-    #   as.data.frame() %>%
-    #   setNames(., c("outcome", "prop")) %>%
-    #   mutate(prop=prop/nrow(Outcome)*100)
     
     ToPlot <- ToPlot[order(ToPlot$prop),]
     ToPlot$class <- factor(ToPlot$class, levels=c("Aves", "Mammalia"))
@@ -192,9 +188,10 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
         scale_x_discrete(limits=c("different","unknown", "same"), labels=c("Contradicting","Unknown", "Similar")) +
         scale_fill_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f")) + 
         theme(legend.position='none') +
-        ggtitle(paste("mammals:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Mammalia"])),
-                      "\n birds:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Aves"])))) + 
-        theme(plot.title = element_text(size =7.5,margin = margin(t = 0), hjust=1))
+        geom_text(
+          aes(label = ToPlot$freq, y = prop + 0.05),
+          position = position_dodge(0.9),
+          vjust = -0.5)+ ylim(0,105)
     }
     
     if(length(unique(ToPlot$outcome))==2){
@@ -204,14 +201,14 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
         xlab(paste(Traitaxis, ImputedaxisX, sep = ", ")) + ylab("% species") +
         scale_x_discrete(limits=c("different", "same"), labels=c("Contradicting", "Similar")) +
         scale_fill_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f")) + 
-        theme(legend.position='none') +
-        ggtitle(paste("mammals:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Mammalia"])),
-                      "\n birds:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Aves"])))) + 
-        theme(plot.title = element_text(size =7.5,margin = margin(t = 0), hjust=1))
-
+        theme(legend.position='none')  +
+        geom_text(
+          aes(label = ToPlot$freq, y = prop + 0.05),
+          position = position_dodge(0.9),
+          vjust = -0.5)+ ylim(0,105)
     }
     
-
+    
     
     # if(!Imputed){
     #   
@@ -226,8 +223,9 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
   }
 }
 
-
+## Function to plot all RC values against mine without distinction of whether values were imputed or collected
 Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, AxisX, AxisY) {
+  
   
   X <- intersect(RC_data$binomial, AE_data$Best_guess_binomial)
   RC_data <- RC_data %>% filter(binomial %in% X)
@@ -246,7 +244,7 @@ Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, Axis
   ToPlot$AE <- AE_data[, TraitName]
   
   if(!Categorical) {  
-
+    
     
     p <- ggplot(ToPlot, aes(AE, RC, color=ToPlot$class)) +
       GGPoptions +
@@ -255,12 +253,13 @@ Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, Axis
       xlab(AxisX) + 
       ylab(AxisY) + 
       scale_color_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f"))
-  
+    
     
     return(p)}
+  
+  else {
     
-    else {
-      
+  
     Outcome <- AE_data[, c("Class","Best_guess_binomial")]
     
     if(Diet) {
@@ -278,15 +277,15 @@ Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, Axis
       y <- RC_data[i, TraitName]
       if(x==y) {Outcome$Result[i] <- "same"} 
       if(x!=y)  { Outcome$Result[i] <- "different"}
-      }
-  
+    }
+
+    
     ToPlot <-  with(Outcome, table(Result, Class)) %>%
       as.data.frame() %>%
       group_by(Class) %>%
-      mutate(Freq=Freq/sum(Freq)*100) %>%
-      setNames(., c("outcome", "class", "prop")) %>%
+      mutate(prop=Freq/sum(Freq)*100) %>%
+      setNames(., c("outcome", "class", "freq","prop")) %>%
       as.data.frame()
-    
     
     ToPlot <- ToPlot[order(ToPlot$prop),]
     ToPlot$class <- factor(ToPlot$class, levels=c("Aves", "Mammalia"))
@@ -300,11 +299,13 @@ Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, Axis
         scale_x_discrete(limits=c("different","unknown", "same"), labels=c("Contradicting","Unknown", "Similar")) +
         scale_fill_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f")) + 
         theme(legend.position='none') +
-        ggtitle(paste("mammals:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Mammalia"])),
-                      "\n birds:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Aves"])))) + 
-        theme(plot.title = element_text(size =7.5,margin = margin(t = 0), hjust=1)) +
-        theme(legend.position="none")
-        
+        geom_text(
+          aes(label = ToPlot$freq, y = prop + 0.05),
+          position = position_dodge(0.9),
+          vjust = -0.5
+        ) + ylim(0,105)
+      
+      
     }
     
     if(length(unique(ToPlot$outcome))==2){
@@ -315,10 +316,11 @@ Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, Axis
         scale_x_discrete(limits=c("different", "same"), labels=c("Contradicting", "Similar")) +
         scale_fill_manual(name="Class", labels = c("Birds", "Mammals"), values = c("#268bd2", "#dc322f")) + 
         theme(legend.position='none') +
-        ggtitle(paste("mammals:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Mammalia"])),
-                      "\n birds:", length(unique(Outcome$Best_guess_binomial[Outcome$Class=="Aves"])))) + 
-        theme(plot.title = element_text(size =7.5, margin = margin(t = 0), hjust=1)) +
-        theme(legend.position="none")
+        geom_text(
+          aes(label = ToPlot$freq, y = prop + 0.05),
+          position = position_dodge(0.9),
+          vjust = -0.5
+        )+ ylim(0,105)
     }
     
     if(Diet) {return(list(p=p, outputs=xreturn))}
@@ -326,7 +328,7 @@ Plot_all_values <- function(RC_data, AE_data, TraitName, Categorical, Diet, Axis
     
   }}
 
-
+## Plot trait coverage
 Plot.Cov <- function(TraitData, Traits, Main) {
   
   Names <- as.data.frame(c("Body_mass_g", "body_mass_median" ,
@@ -352,8 +354,3 @@ Plot.Cov <- function(TraitData, Traits, Main) {
   
   abline(v=100, lty="dotted")
 }
-
-
-
-
-

@@ -28,11 +28,11 @@ clusterEvalQ(Cluster, {
 
 source("Functions_for_missForest_imputations.R")
 
-## Load trait data: transformed and standardised, with phylogenetic imformation as eigenvectors
-Mammals_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Mammals.csv")
-Birds_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Birds.csv")
-Amphibians_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Amphibians.csv")
-Reptiles_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Reptiles.csv")
+# ## Load trait data: transformed and standardised, with phylogenetic imformation as eigenvectors
+# Mammals_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Mammals.csv")
+# Birds_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Birds.csv")
+# Amphibians_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Amphibians.csv")
+# Reptiles_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Reptiles.csv")
 
 ## Load trait data: NOT transformed and NOT standardised, with phylogenetic imformation as eigenvectors
 Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
@@ -40,17 +40,6 @@ Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_corr
 Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
 Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
-
-# # # for quickly testing code
-# Mammals_st <- Mammals_st[c(1:15),]
-# Birds_st <- Birds_st[c(1:15),]
-# Amphibians_st <- Amphibians_st[c(1:15),]
-# Reptiles_st <- Reptiles_st[c(1:15),]
-# 
-# Mammals <- Mammals[c(1:15),]
-# Birds <- Birds[c(1:15),]
-# Amphibians <- Amphibians[c(1:15),]
-# Reptiles <- Reptiles[c(1:15),]
 
 ## Define variables for imputations
 
@@ -62,8 +51,8 @@ Diet <- c("IN", "VE", "PL", "SE", "NE", "FR")
 
 Taxinfo <- "Order"
 
-Traits_cont_st <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", "sqrt_Diet_breadth",
-                  "Range_size_m2", "sqrt_Habitat_breadth_IUCN")
+# Traits_cont_st <-  c("log10_Body_mass_g", "log10_Longevity_d", "log10_Litter_size", "sqrt_Diet_breadth",
+#                   "Range_size_m2", "sqrt_Habitat_breadth_IUCN")
 
 Traits_cont <-  c("Body_mass_g", "Longevity_d", "Litter_size", "Diet_breadth",
                      "Range_size_m2", "Habitat_breadth_IUCN")
@@ -73,10 +62,10 @@ Traits_cat <- c(Habitat, "Specialisation",
                
 
 ## Add some traits for each taxon
-MammalsCont_st <- c(Traits_cont_st, "log10_Generation_length_d", "log10_Adult_svl_cm")
-BirdsCont_st <- Traits_cont_st
-ReptilesCont_st <- c(Traits_cont_st, "log10_Adult_svl_cm", "log10_Maturity_d")
-AmphibiansCont_st <- c(Traits_cont_st, "log10_Body_length_mm")
+# MammalsCont_st <- c(Traits_cont_st, "log10_Generation_length_d", "log10_Adult_svl_cm")
+# BirdsCont_st <- Traits_cont_st
+# ReptilesCont_st <- c(Traits_cont_st, "log10_Adult_svl_cm", "log10_Maturity_d")
+# AmphibiansCont_st <- c(Traits_cont_st, "log10_Body_length_mm")
 
 MammalsCont <- c(Traits_cont, "Generation_length_d", "Adult_svl_cm")
 BirdsCont <- Traits_cont
@@ -86,27 +75,27 @@ AmphibiansCont <- c(Traits_cont, "Body_length_mm")
 
 ## Function arguments as lists, nested into one bigger list - each of these list elements are agurments for the function Imputations_missForest
 DF.TraitsList <- list(M=Mammals, B=Birds, R=Reptiles, A=Amphibians)
-DF.TraitsList_st <- list(M=Mammals_st, B=Birds_st, R=Reptiles_st, A=Amphibians_st)
+#DF.TraitsList_st <- list(M=Mammals_st, B=Birds_st, R=Reptiles_st, A=Amphibians_st)
 Taxinfo.List <- list(M="Order", B="Order", R="Order", A="Order")
-Cont.TraitsList_st <- list(M=MammalsCont_st, B=BirdsCont_st, R=ReptilesCont_st, A=AmphibiansCont_st)
+#Cont.TraitsList_st <- list(M=MammalsCont_st, B=BirdsCont_st, R=ReptilesCont_st, A=AmphibiansCont_st)
 Cont.TraitsList <- list(M=MammalsCont, B=BirdsCont, R=ReptilesCont, A=AmphibiansCont)
 Cat.TraitsList <- list(M=Traits_cat, B=Traits_cat, R=Traits_cat[Traits_cat %nin% Diet], A=Traits_cat)
 EV.List <- list(M="EV_1", B="EV_1", R="EV_1", A="EV_1")
 ErrorTrue.List <- list(M=TRUE, B=TRUE, R=TRUE, A=TRUE)
 DietTRUE.List <- list(M=TRUE, B=TRUE, R=FALSE, A=TRUE)
-std.List_st <- list(M=TRUE, B=TRUE, R=TRUE, A=TRUE)
+#std.List_st <- list(M=TRUE, B=TRUE, R=TRUE, A=TRUE)
 std.List <- list(M=FALSE, B=FALSE, R=FALSE, A=FALSE)
 
 # List of function arguments. This list  will be replicated 8 times (number of cores) for parallel imputations.
 # On each cluster, imputation of 4 datasets (one for each class). 
-ArgumentsList_st <- list(TraitDF=DF.TraitsList_st,
-					            Taxinfo=Taxinfo.List,
-					            Traits_cont=Cont.TraitsList_st,
-					            Traits_cat=Cat.TraitsList,
-					            EV=EV.List,
-					            ErrorTrue=ErrorTrue.List,
-					            DietTRUE=DietTRUE.List, 
-					            std=std.List_st)
+# ArgumentsList_st <- list(TraitDF=DF.TraitsList_st,
+# 					            Taxinfo=Taxinfo.List,
+# 					            Traits_cont=Cont.TraitsList_st,
+# 					            Traits_cat=Cat.TraitsList,
+# 					            EV=EV.List,
+# 					            ErrorTrue=ErrorTrue.List,
+# 					            DietTRUE=DietTRUE.List, 
+# 					            std=std.List_st)
 
 ArgumentsList <- list(TraitDF=DF.TraitsList,
                          Taxinfo=Taxinfo.List,
@@ -157,5 +146,21 @@ saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/Imputed_not_standa
 ## DESTROY CLUSTER
 stopCluster(Cluster)
 
-
+# # # # for quickly testing code
+# Mammals <- Mammals[c(1:15),]
+# Birds <- Birds[c(1:15),]
+# Amphibians <- Amphibians[c(1:15),]
+# Reptiles <- Reptiles[c(1:15),]
+# DF.TraitsList <- list(M=Mammals, B=Birds, R=Reptiles, A=Amphibians)
+# ArgumentsList <- list(TraitDF=DF.TraitsList,
+#                       Taxinfo=Taxinfo.List,
+#                       Traits_cont=Cont.TraitsList,
+#                       Traits_cat=Cat.TraitsList,
+#                       EV=EV.List,
+#                       ErrorTrue=ErrorTrue.List,
+#                       DietTRUE=DietTRUE.List, 
+#                       std=std.List)
+# 
+# Test <- To_apply_parallel_imputations(ArgumentsList)
+# 
 

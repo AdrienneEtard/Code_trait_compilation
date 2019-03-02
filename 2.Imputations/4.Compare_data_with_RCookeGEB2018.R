@@ -59,7 +59,7 @@ AE_Imputed$log10_Body_mass_kg <- log10(AE_Imputed$Body_mass_g / 1000)
 
 
 
-## 1. Compare initial trait coverage
+## 1.a. Compare initial trait coverage
 pdf(file="../../Results/Plots/Comparison_with_RCooke/Coverage.pdf", width=7, height=4.5, family="Times", pointsize=16)
 par(family='serif', tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(2,7,2,2), oma=c(1,1,1,1))
 par(mfrow=c(2,2))
@@ -76,7 +76,7 @@ mtext(at=-210, line=-7.5, "% coverage", cex=0.8)
 dev.off()
 
 
-## Plot all traits against each other
+## 1.b. Plot all traits against each other
 p1 <- Plot_all_values(RC_Imputed, AE_Imputed, "log10_Body_mass_kg", FALSE, AxisX = "Body mass (kg, log10, AE)", AxisY = "Body mass (kg, log10, RC)", Diet = FALSE) + 
   labs(tag = "A") + theme(plot.tag.position = c(0.3, 0.92))
 p2 <- Plot_all_values(RC_Imputed, AE_Imputed, "Litter_size", FALSE, AxisX = "Litter size (AE)", AxisY = "Litter size (RC)", Diet = FALSE)+ 
@@ -84,15 +84,12 @@ p2 <- Plot_all_values(RC_Imputed, AE_Imputed, "Litter_size", FALSE, AxisX = "Lit
 p3 <- Plot_all_values(RC_Imputed, AE_Imputed, "Habitat_breadth_IUCN", FALSE, AxisX = "Habitat breadth (AE)", AxisY = "Habitat breadth (RC)", Diet = FALSE)+ 
   labs(tag = "C") + theme(plot.tag.position = c(0.3, 0.92))
 p4 <- Plot_all_values(RC_Imputed, AE_Imputed, "Diel_activity", TRUE, AxisX = "Diel activity", AxisY = "Diel activity", Diet = FALSE)+ 
-  labs(tag = "D") + theme(plot.tag.position = c(0.3, 0.81))
+  labs(tag = "D") + theme(plot.tag.position = c(0.3, 0.92))
 p5 <- Plot_all_values(RC_Imputed, AE_Imputed, "Primary_diet", TRUE, AxisX = "Primary diet", AxisY = "Pirmary diet", Diet = TRUE)
-p5p <- p5$p + labs(tag = "E") + theme(plot.tag.position = c(0.3, 0.81))
+p5p <- p5$p + labs(tag = "E") + theme(plot.tag.position = c(0.3, 0.92))
 p <- ggarrange(p1,p2,p3,p4,p5p,common.legend = TRUE)
-ggsave(p, file="../../Results/Plots/Comparison_with_RCooke/Comparison_all_values.pdf", width =8, height =5)
+ggsave(p, file="../../Results/Plots/Comparison_with_RCooke/Comparison_all_values.pdf", width =8, height =6)
 
-
-
-p5$p + theme(plot.title = element_text(size = 8, margin = margin(t = 0), hjust=0.5))
 
 ## 2. Comparison of collected data for mammals and birds
 p1 <- Compare(RC_Collected, NULL, AE_Collected, NULL, FALSE,"log10_Body_mass_kg", FALSE, "BM ","collected", "collected", FALSE, FALSE, FALSE) + 
@@ -102,9 +99,9 @@ p2 <- Compare(RC_Collected, NULL, AE_Collected, NULL, FALSE, "Litter_size", FALS
 p3 <- Compare(RC_Collected, NULL, AE_Collected, NULL, FALSE,"Habitat_breadth_IUCN", FALSE, "HB ", "collected", "collected", FALSE, FALSE, FALSE) +
   labs(tag = "C") + theme(plot.tag.position = c(0.2, 0.94))
 p4 <- Compare(RC_Collected, NULL,  AE_Collected, NULL, FALSE, "Diel_activity", TRUE, "DA", "collected", "collected", FALSE, FALSE, FALSE) +
-  labs(tag = "D") + theme(plot.tag.position = c(0.2, 0.94))
+  labs(tag = "D") + theme(plot.tag.position = c(0.22, 0.94))
 X <- Compare(RC_Collected, NULL,  AE_Collected, NULL, FALSE, "Primary_diet", TRUE, "PD", "collected", "collected", FALSE, FALSE, TRUE)
-p5 <- X$p + labs(tag = "E") + theme(plot.tag.position = c(0.2, 0.94))
+p5 <- X$p + labs(tag = "E") + theme(plot.tag.position = c(0.22, 0.94))
 p <- ggarrange(p2,p1,p3,p4,p5,common.legend = TRUE, legend="top")
 ggsave(p, file="../../Results/Plots/Comparison_with_RCooke/Comparison_collected.pdf", width =10, height =6)
 
@@ -116,19 +113,16 @@ p2 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, TRUE, "Litter_
 p3 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, TRUE, "Habitat_breadth_IUCN", FALSE, "HB ", "imputed", "imputed", FALSE, FALSE, FALSE) +
   labs(tag = "C") + theme(plot.tag.position = c(0.17, 0.94))
 p4 <- Compare(RC_Collected, RC_Imputed,  AE_Collected, AE_Imputed,TRUE, "Diel_activity", TRUE, "DA", "imputed","imputed", FALSE, FALSE, FALSE) +
-  labs(tag = "B") + theme(plot.tag.position = c(0.17, 0.94))
+  labs(tag = "B") + theme(plot.tag.position = c(0.19, 0.94))
 X <- Compare(RC_Collected, RC_Imputed,  AE_Collected, AE_Imputed, TRUE, "Primary_diet", TRUE, "PD", "imputed","imputed", FALSE, FALSE, TRUE)
-p5 <- X$p + labs(tag = "D") + theme(plot.tag.position = c(0.95, 0.94))
+p5 <- X$p + labs(tag = "D") + theme(plot.tag.position = c(0.19, 0.94))
 p <- ggarrange(p2,p4,p3,p5,common.legend = TRUE)
 ggsave(p, file="../../Results/Plots/Comparison_with_RCooke/Comparison_imputed.pdf", width =8, height =6)
 
 
 ## 4.Imputed VS collected, collected VS imputed
-
-# Collected RC vs Imputed AE
 p1 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, FALSE, "log10_Body_mass_kg", FALSE, "BM, log10 ", "imputed", "imputed", TRUE, TRUE, FALSE) +
   labs(tag = "E") + theme(plot.tag.position = c(0.20, 0.94))
-#p1 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, FALSE ,"Body_mass_g", FALSE, "BM","imputed","imputed", TRUE, FALSE, FALSE)
 
 p2 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed,  FALSE, "Litter_size", FALSE, "LCS ", "imputed", "imputed", TRUE, TRUE, FALSE) +
   labs(tag = "C") + theme(plot.tag.position = c(0.20, 0.94))
@@ -142,23 +136,18 @@ p3b <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, FALSE, "Habit
 
 p4 <- ggarrange(
   Compare(RC_Collected, RC_Imputed,  AE_Collected, AE_Imputed,FALSE, "Diel_activity", TRUE, "DA", "imputed","imputed", TRUE, TRUE, FALSE)+ labs(tag = "F") + 
-    theme(plot.tag.position = c(0.2, 0.94)),
+    theme(plot.tag.position = c(0.25, 0.94)),
   Compare(RC_Collected, RC_Imputed,  AE_Collected, AE_Imputed, FALSE, "Diel_activity", TRUE, "DA", "imputed","imputed", TRUE, FALSE, FALSE)+ labs(tag = "G")
-  + theme(plot.tag.position = c(0.2, 0.94))
+  + theme(plot.tag.position = c(0.25, 0.94))
 )
 
 p5 <- ggarrange(
   Compare(RC_Collected, RC_Imputed,  AE_Collected, AE_Imputed, FALSE, "Primary_diet", TRUE, "PD", "imputed","imputed", TRUE, TRUE, TRUE)$p
-  + theme(plot.tag.position = c(0.95, 0.94))+ labs(tag = "H"),
+  + theme(plot.tag.position = c(0.25, 0.94))+ labs(tag = "H"),
   Compare(RC_Collected, RC_Imputed,  AE_Collected, AE_Imputed, FALSE, "Primary_diet", TRUE, "PD", "imputed","imputed", TRUE, FALSE, TRUE)$p + 
-  theme(plot.tag.position = c(0.95, 0.94))+ labs(tag = "I")
+  theme(plot.tag.position = c(0.25, 0.94))+ labs(tag = "I")
 )
 
-pb <- ggarrange(p3b,p3,p2,p2b, common.legend = TRUE, ncol=2, nrow=2)
-p <- ggarrange(p4,p5, ncol=1, nrow=2)
-pf <- ggarrange(pb, p, ncol=2, widths = c(1/2, 1/2))
-pff <- ggarrange(pf, p1, nrow=2, widths = c(3/4, 1/4), heights = c(2/3,1/3), common.legend = TRUE)
-
-
+p <- ggarrange(p3b,p3,p4,p2,p2b,p5,p1, common.legend = TRUE, widths = c(1/4,1/4, 1/2))
 ggsave(p, file="../../Results/Plots/Comparison_with_RCooke/Comparison_imputed_VS_collected.pdf", width =13, height =9)
 

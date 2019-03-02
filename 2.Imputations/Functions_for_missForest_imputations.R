@@ -21,7 +21,6 @@
 
 Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, EV, ErrorTrue, DietTRUE, std) {
 
-  browser()
   
   ## Select traits of interest, to impute, and phylogenetic eigenvectors, and taxinfo 
   To_impute <- TraitDF[, colnames(TraitDF) %in% c(Taxinfo, Traits_cont, Traits_cat, EV)]
@@ -193,7 +192,6 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   rownames(Imputed) <- c(1:nrow(Imputed))
   
   ## Return
-  
   ToReturn <- list(Imputed.Dataset=Imputed, Imputation.errors=Errors)
   ToReturn <- list(ToReturn)
   
