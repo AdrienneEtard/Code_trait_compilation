@@ -136,7 +136,7 @@ TraitsReptile <- merge(TraitsReptile, Schwarz[,c("Best_guess_binomial", "Litter_
 # Merge Birds -------------------------------------------------------------
 TraitsBird <- merge(Butchart_BM[, c("Best_guess_binomial", "Body_mass_g")], 
                     Myhrvold[Myhrvold$class=="Aves", c("Best_guess_binomial", X$Traits.Myhrvold)], all=T)
-TraitsBird <- merge(TraitsBird, Butchart_GL[, c("Best_guess_binomial", "Longevity_d")], all=T)
+TraitsBird <- merge(TraitsBird, Butchart_GL[, c("Best_guess_binomial", "Generation_length_d")], all=T)
 TraitsBird <- merge(TraitsBird, Bird_range[, c("Best_guess_binomial", "Range_size_m2")], all=T)
 TraitsBird <- merge(TraitsBird, Elton_BD[, c("Best_guess_binomial", X$Bird_traits.Elton)], all=T)
 TraitsBird <- merge(TraitsBird, Habitat_bird, all=T)

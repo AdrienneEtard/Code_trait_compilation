@@ -56,11 +56,24 @@ Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, E
   ## Impute missing values
   print("Imputing missing values.")
   
-  if (isTRUE(ErrorTrue)) { R.Imputed <- missForest(To_impute, variablewise = TRUE) } 
-  else { R.Imputed <- missForest(To_impute, variablewise = FALSE) }
+  browser()
   
+  if (isTRUE(ErrorTrue)) { R.Imputed <- missForest(To_impute, variablewise = TRUE) 
   Imputed <- R.Imputed$ximp
+  Errors <- R.Imputed$OOBerror %>% 
+    as.data.frame() %>%
+    t() %>%
+    as.data.frame()
+  
+  colnames(Errors) <- paste(colnames(Imputed), names(R.Imputed$OOBerror))
+  row.names(Errors) <- 1
+  } 
+  else { R.Imputed <- missForest(To_impute, variablewise = FALSE) 
   Errors <- R.Imputed$OOBerror
+  Imputed <- R.Imputed$ximp
+  }
+  
+
   
   ## Select traits and variables of interest after imputations
   

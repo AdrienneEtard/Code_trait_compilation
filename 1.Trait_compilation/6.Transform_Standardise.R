@@ -64,6 +64,7 @@ Birds <- Transform_zscore(Birds, "Body_mass_g", "log10")
 Birds <- Transform_zscore(Birds, "Adult_svl_cm", "log10")
 Birds <- Transform_zscore(Birds, "Maturity_d", "log10")
 Birds <- Transform_zscore(Birds, "Longevity_d", "log10")
+Birds <- Transform_zscore(Birds, "Generation_length_d", "log10")
 Birds <- Transform_zscore(Birds, "Litter_size", "log10")
 Birds <- Transform_zscore(Birds, "Habitat_breadth_IUCN", "sqrt")
 Birds <- Transform_zscore(Birds, "Diet_breadth", "sqrt")
@@ -99,7 +100,7 @@ Amphibians <- Amphibians[, c("Class", "Order", "Family", "Genus", "Best_guess_bi
                          "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 
 Birds <- Birds[, c("Class", "Order", "Family", "Genus", "Best_guess_binomial",
-                             "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Maturity_d", "log10_Longevity_d",
+                             "log10_Body_mass_g", "log10_Adult_svl_cm", "log10_Generation_length_d","log10_Maturity_d", "log10_Longevity_d",
                              "log10_Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "sqrt_Diet_breadth","Primary_diet",Diet,"Specialisation",
                              "sqrt_Habitat_breadth_IUCN", Habitat, Ev)]
 

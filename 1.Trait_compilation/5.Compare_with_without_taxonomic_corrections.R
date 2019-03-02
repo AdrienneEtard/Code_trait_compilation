@@ -164,7 +164,7 @@ Traits_cont <-  c("Body_mass_g", "Longevity_d", "Litter_size", "Range_size_m2", 
 Traits_cat <- c("Specialisation", "Diel_activity","Trophic_level", "Primary_diet")
 
 TMammalsI <- c(Traits_cont, Traits_cat, "Generation_length_d", "Adult_svl_cm")
-TBirdsI <- c(Traits_cont, Traits_cat)
+TBirdsI <- c(Traits_cont, Traits_cat, "Generation_length_d")
 TReptilesI <- c(Traits_cont, Traits_cat, "Adult_svl_cm", "Maturity_d")
 TAmphibiansI <- c(Traits_cont, Traits_cat, "Body_length_mm")
 

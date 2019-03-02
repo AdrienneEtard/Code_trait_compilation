@@ -90,13 +90,13 @@ Percent_info_plot <- function(TraitDFC, TraitDFU, Traits, FontSize, BW) {
   
 }
 
-TraitFillMammals <- Percent_info_plot(Mammals, UMammals, Traits, 13, 2)
-TraitFillBirds <- Percent_info_plot(Birds, UBirds, Traits, 13, 2)
-TraitFillReptiles <- Percent_info_plot(Reptiles, UReptiles, TraitsReptiles, 13, 2)
-TraitFillAmphibians <- Percent_info_plot(Amphibians, UAmphibians, Traits, 13, 2)
+TraitFillMammals <- Percent_info_plot(Mammals, UMammals, Traits, 13, 2) + xlab(NULL)
+TraitFillBirds <- Percent_info_plot(Birds, UBirds, Traits, 13, 5) + ylab(NULL) + xlab(NULL)
+TraitFillReptiles <- Percent_info_plot(Reptiles, UReptiles, TraitsReptiles, 13, 2) 
+TraitFillAmphibians <- Percent_info_plot(Amphibians, UAmphibians, Traits, 13, 2) + ylab(NULL)
 p <- ggarrange(TraitFillMammals, TraitFillBirds, TraitFillReptiles, TraitFillAmphibians, common.legend = TRUE,
-               labels=c("A", "B", "C", "D"), hjust=c(-6,-6,-16,-16), vjust=2, font.label = list(family="serif"))
-ggsave(p, file="../../Results/Plots/Trait_missing_values/Traitfillingdist.pdf", width=5, height=5)
+               labels=c("A", "B", "C", "D"), hjust=c(-6,-6,-22,-22), vjust=2, font.label = list(family="serif"))
+ggsave(p, file="../../Results/Plots/Trait_missing_values/Traitfillingdist.pdf", width=6.5, height=5)
 
 ## 2. Are missing values missing at random? Association between NAs and taxonomy.
 

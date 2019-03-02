@@ -147,20 +147,20 @@ clusterExport(cl=Cluster, list(".Format_tiplabels","PhySignal", #"PhySignal_Cat"
 ## PARALLEL CALCULATIONS WITH parApply
 
 # Phylogenetic signal in continuous traits
-Lambda_Mammals_continuous <- parApply(Cluster, Mammals[, Continuous.Traits], 2, PhySignal, Names=Names.Mammals, Phylo=Phylo_Mammals %>% as.data.frame())
-Lambda_Birds_continuous <- parApply(Cluster, Birds[, Continuous.Traits], 2, PhySignal, Names=Names.Birds, Phylo=Phylo_Birds%>% as.data.frame())
-Lambda_Reptiles_continuous <- parApply(Cluster, Reptiles[, Continuous.Traits], 2, PhySignal, Names=Names.Reptiles, Phylo=Phylo_Reptiles)
-Lambda_Amphibians_continuous <- parApply(Cluster, Amphibians[, Continuous.Traits], 2, PhySignal, Names=Names.Amphibians, Phylo=Phylo_Amphibians)
+Lambda_Mammals_continuous <- parApply(Cluster, Mammals[, c(Continuous.Traits,"Generation_length_d", "Adult_svl_cm")], 2, PhySignal, Names=Names.Mammals, Phylo=Phylo_Mammals) %>% as.data.frame()
+Lambda_Birds_continuous <- parApply(Cluster, Birds[, c(Continuous.Traits, "Generation_length_d")], 2, PhySignal, Names=Names.Birds, Phylo=Phylo_Birds) %>% as.data.frame()
+Lambda_Reptiles_continuous <- parApply(Cluster, Reptiles[, c(Continuous.Traits,"Adult_svl_cm", "Maturity_d")], 2, PhySignal, Names=Names.Reptiles, Phylo=Phylo_Reptiles) %>% as.data.frame()
+Lambda_Amphibians_continuous <- parApply(Cluster, Amphibians[, c(Continuous.Traits, "Body_length_mm")], 2, PhySignal, Names=Names.Amphibians, Phylo=Phylo_Amphibians) %>% as.data.frame()
 
-# Phylogenetic signal in categorical traits
-Lambda_Mammals_categorical <- parApply(Cluster, Mammals[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Mammals, Phylo=Phylo_Mammals)
-Lambda_Birds_categorical <- parApply(Cluster, Birds[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Birds, Phylo=Phylo_Birds)
-Lambda_Reptiles_categorical <- parApply(Cluster, Reptiles[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Reptiles, Phylo=Phylo_Reptiles)
-Lambda_Amphibians_categorical <- parApply(Cluster, Amphibians[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Amphibians, Phylo=Phylo_Amphibians)
+# # Phylogenetic signal in categorical traits
+# Lambda_Mammals_categorical <- parApply(Cluster, Mammals[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Mammals, Phylo=Phylo_Mammals)
+# Lambda_Birds_categorical <- parApply(Cluster, Birds[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Birds, Phylo=Phylo_Birds)
+# Lambda_Reptiles_categorical <- parApply(Cluster, Reptiles[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Reptiles, Phylo=Phylo_Reptiles)
+# Lambda_Amphibians_categorical <- parApply(Cluster, Amphibians[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Amphibians, Phylo=Phylo_Amphibians)
 
 
 ## Save files
-write.csv(Lambda_Mammals_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousMammals.csv",row.names = FALSE)
+# write.csv(Lambda_Mammals_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousMammals.csv",row.names = FALSE)
 write.csv(Lambda_Birds_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousBirds.csv",row.names = FALSE)
 write.csv(Lambda_Reptiles_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousReptiles.csv",row.names = FALSE)
 write.csv(Lambda_Amphibians_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousAmphibians.csv",row.names = FALSE)

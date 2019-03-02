@@ -68,7 +68,7 @@ Traits_cat <- c(Habitat, "Specialisation",
 # AmphibiansCont_st <- c(Traits_cont_st, "log10_Body_length_mm")
 
 MammalsCont <- c(Traits_cont, "Generation_length_d", "Adult_svl_cm")
-BirdsCont <- Traits_cont
+BirdsCont <- c(Traits_cont, "Generation_length_d")
 ReptilesCont <- c(Traits_cont, "Adult_svl_cm", "Maturity_d")
 AmphibiansCont <- c(Traits_cont, "Body_length_mm")
 
@@ -146,7 +146,7 @@ saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/Imputed_not_standa
 ## DESTROY CLUSTER
 stopCluster(Cluster)
 
-# # # # for quickly testing code
+# # # # # for quickly testing code
 # Mammals <- Mammals[c(1:15),]
 # Birds <- Birds[c(1:15),]
 # Amphibians <- Amphibians[c(1:15),]
@@ -158,9 +158,9 @@ stopCluster(Cluster)
 #                       Traits_cat=Cat.TraitsList,
 #                       EV=EV.List,
 #                       ErrorTrue=ErrorTrue.List,
-#                       DietTRUE=DietTRUE.List, 
+#                       DietTRUE=DietTRUE.List,
 #                       std=std.List)
 # 
 # Test <- To_apply_parallel_imputations(ArgumentsList)
-# 
+
 

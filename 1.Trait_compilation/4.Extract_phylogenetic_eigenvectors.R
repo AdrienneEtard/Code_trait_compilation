@@ -159,7 +159,7 @@ C_Amphibians <- C_Amphibians[, c(Taxinfo,
                              "Habitat_breadth_IUCN", Habitat, Ev)]
 
 C_Birds <- C_Birds[, c(Taxinfo,
-                   "Body_mass_g", "Adult_svl_cm", "Maturity_d", "Longevity_d",
+                   "Body_mass_g", "Adult_svl_cm", "Generation_length_d","Maturity_d", "Longevity_d",
                    "Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "Diet_breadth","Primary_diet",Diet,"Specialisation",
                    "Habitat_breadth_IUCN", Habitat, Ev)]
 
@@ -182,7 +182,7 @@ UN_Amphibians <- UN_Amphibians[, c("Class", "Best_guess_binomial",
                                  "Habitat_breadth_IUCN", Habitat, Ev)]
 
 UN_Birds <- UN_Birds[, c("Class","Best_guess_binomial",
-                       "Body_mass_g", "Adult_svl_cm", "Maturity_d", "Longevity_d",
+                       "Body_mass_g", "Adult_svl_cm", "Generation_length_d","Maturity_d", "Longevity_d",
                        "Litter_size", "Range_size_m2", "Diel_activity", "Trophic_level", "Diet_breadth","Primary_diet",Diet,"Specialisation",
                        "Habitat_breadth_IUCN", Habitat, Ev)]
 

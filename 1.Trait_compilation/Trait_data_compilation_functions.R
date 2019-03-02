@@ -161,8 +161,8 @@
   colnames(Butchart_BM)[29] <- "Body_mass_g"
   
   # Butchart Avian generation length
-  colnames(Butchart_GL)[2] <- "Longevity_d"
-  Butchart_GL$Longevity_d <- Butchart_GL$Longevity_d * 365.25
+  colnames(Butchart_GL)[2] <- "Generation_length_d"
+  Butchart_GL$Generation_length_d <- Butchart_GL$Generation_length_d * 365.25
   
  # # Sekercioglu
  # Traits.Sekercioglu <- c(Diet, "Diet_breadth", "Trophic_level")
