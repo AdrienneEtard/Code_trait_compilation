@@ -41,7 +41,10 @@ Traits <- c("Body_mass_g",
             "Primary_diet",
             "Diet_breadth")
 
-TraitsReptiles <- Traits[1:8]
+TraitsReptiles <- c(Traits[1:8], "Adult_svl_cm", "Maturity_d")
+TraitsAmphibians <- c(Traits, "Body_length_mm")
+TraitsMammals <- c(Traits, "Adult_svl_cm", "Generation_length_d")
+TraitsBirds <- c(Traits, "Generation_length_d")
 
 ## 1. Plotting percent information across species ("trait filling" across species)
 
@@ -83,20 +86,21 @@ Percent_info_plot <- function(TraitDFC, TraitDFU, Traits, FontSize, BW) {
   med <- ddply(Results, "Taxonomy", summarise, grp.median=median(Percent)); print(med)
   p <- ggplot(Results, aes(Percent, fill=Taxonomy)) +
     geom_density(alpha=0.5, adjust=BW) + GGPoptions +
-    geom_vline(data=med, aes(xintercept=grp.median), linetype="dashed") +
-    xlab("Trait filling (%)") + ylab("Density")
+    geom_vline(data=med[med$Taxonomy=="Uncorrected", ], aes(xintercept=grp.median), linetype="dashed", col="red", alpha=0.7) +
+    geom_vline(data=med[med$Taxonomy=="Corrected", ], aes(xintercept=grp.median), linetype="dashed", col="blue", alpha=0.7) +
+    xlab("Completeness (%)") + ylab("Density of species")
     
   return(p)
   
 }
 
-TraitFillMammals <- Percent_info_plot(Mammals, UMammals, Traits, 13, 2) + xlab(NULL)
-TraitFillBirds <- Percent_info_plot(Birds, UBirds, Traits, 13, 5) + ylab(NULL) + xlab(NULL)
+TraitFillMammals <- Percent_info_plot(Mammals, UMammals, TraitsMammals, 13, 2) + xlab(NULL)
+TraitFillBirds <- Percent_info_plot(Birds, UBirds, TraitsBirds, 13, 5) + ylab(NULL) + xlab(NULL)
 TraitFillReptiles <- Percent_info_plot(Reptiles, UReptiles, TraitsReptiles, 13, 2) 
-TraitFillAmphibians <- Percent_info_plot(Amphibians, UAmphibians, Traits, 13, 2) + ylab(NULL)
+TraitFillAmphibians <- Percent_info_plot(Amphibians, UAmphibians, TraitsAmphibians, 13, 2) + ylab(NULL)
 p <- ggarrange(TraitFillMammals, TraitFillBirds, TraitFillReptiles, TraitFillAmphibians, common.legend = TRUE,
-               labels=c("A", "B", "C", "D"), hjust=c(-6,-6,-22,-22), vjust=2, font.label = list(family="serif"))
-ggsave(p, file="../../Results/Plots/Trait_missing_values/Traitfillingdist.pdf", width=6.5, height=5)
+               labels=c("A", "B", "C", "D"), hjust=c(-6,-6,-21,-21), vjust=2, font.label = list(family="serif"))
+ggsave(p, file="../../Results/Plots/Trait_missing_values/Traitcompleteness.pdf", width=6.5, height=5)
 
 ## 2. Are missing values missing at random? Association between NAs and taxonomy.
 

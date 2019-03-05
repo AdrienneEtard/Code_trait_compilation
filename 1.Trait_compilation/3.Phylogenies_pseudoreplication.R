@@ -11,16 +11,16 @@ source("Functions_for_phylogenies.R")
 
 ## Load data
 # No taxonomic correction
-UN_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.standardised/Amphibians.csv")
-UN_Birds <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.standardised/Birds.csv")
-UN_Mammals <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.standardised/Mammals.csv")
-UN_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/3.standardised/Reptiles.csv")
+UN_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/2.filtered/Amphibians.csv")
+UN_Birds <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/2.filtered/Birds.csv")
+UN_Mammals <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/2.filtered/Mammals.csv")
+UN_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/Without_taxonomic_correction/All_species/2.filtered/Reptiles.csv")
 
 # With taxonomic correction
-C_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Amphibians.csv")
-C_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Birds.csv")
-C_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Mammals.csv")
-C_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.standardised/Reptiles.csv")
+C_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Amphibians.csv")
+C_Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Birds.csv")
+C_Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Mammals.csv")
+C_Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/2.filtered/Reptiles.csv")
 
 ## Load PREDICTS with and without taxonomic correction
 UN_Predicts <- readRDS("../../Data/PREDICTS_database.rds") %>% 
@@ -115,19 +115,24 @@ PhyloReptile_UN <- read.newick("../../Results/1.Phylogenies/Uncorrected/1.Random
 # Mammals
 Drop_Mammals <- DropTips(Phylo_Mammals, PhyloMammal_UN)
 Phylo_Mammals.final <- Drop_Mammals$PhylogenyCor
-# DroppedMammals <- Drop_Mammals$Replicated
-# MTC <- Drop_Mammals$PbSpecies
-# table(DroppedMammals$Count)
+DroppedMammals <- Drop_Mammals$Replicated
+MTC <- Drop_Mammals$PbSpecies
+table(DroppedMammals$Count)
+table(DroppedMammals$Are_sister_species)
+table(DroppedMammals$In_uncorrected_tree)
+DroppedMammals$RangePos[DroppedMammals$Reps %in% MTC$Reps]
 
 
 # Birds
 Drop_Birds <- DropTips(Phylo_Birds, PhyloBird_UN)
 Phylo_Birds.final <- Drop_Birds$PhylogenyCor
-# DroppedBirds <- Drop_Birds$Replicated
-# BTC <- Drop_Birds$PbSpecies
-# table(DroppedBirds$Count)
-# X <- Phylo_Birds.final$tip.label %>% as.data.frame() %>% setNames(., "Rep") %>% group_by(Rep) %>%
-#   summarise(Count=n())
+DroppedBirds <- Drop_Birds$Replicated
+BTC <- Drop_Birds$PbSpecies
+table(DroppedBirds$Count)
+table(DroppedBirds$Are_sister_species)
+table(DroppedBirds$In_uncorrected_tree)
+DroppedBirds$RangePos[DroppedBirds$Reps %in% BTC$Reps]
+
 
 # Reptiles
 Drop_Reptiles <- DropTips(Phylo_Reptiles, PhyloReptile_UN)
@@ -135,6 +140,9 @@ Phylo_Reptiles.final <- Drop_Reptiles$PhylogenyCor
 DroppedReptiles <- Drop_Reptiles$Replicated
 RTC <- Drop_Reptiles$PbSpecies
 table(DroppedReptiles$Count)
+table(DroppedReptiles$Are_sister_species)
+table(DroppedReptiles$In_uncorrected_tree)
+DroppedReptiles$RangePos[DroppedReptiles$Reps %in% RTC$Reps]
 
 
 # Amphibians
@@ -143,7 +151,9 @@ Phylo_Amphibians.final <- Drop_Amphibians$PhylogenyCor
 DroppedAmphibians <- Drop_Amphibians$Replicated
 ATC <-Drop_Amphibians$PbSpecies
 table(DroppedAmphibians$Count)
-
+table(DroppedAmphibians$Are_sister_species)
+table(DroppedAmphibians$In_uncorrected_tree)
+DroppedAmphibians$RangePos[DroppedAmphibians$Reps %in% ATC$Reps]
 
 # ## Replicated species that are also in PREDICTS
 # intersect(Rep_in_Predicts(C_Predicts, "Aves", DroppedBirds), BTC$Reps)
@@ -161,70 +171,106 @@ write.tree(Phylo_Mammals.final, "../../Results/1.Phylogenies/Corrected/2.Dropped
 
 
 # ## 2.3. Case studies (examples) 
-# 
-# ## 1: Rhinolophus pusillus - dropped tips will be the ones furthest from the original position
-# # for which there are 8 identified synonyms, and 5 replicates
-# # PhyloMammal_UN$tip.label <- paste(paste(substr(PhyloMammal_UN$tip.label,1,1), ".", sep=""), word(PhyloMammal_UN$))
-# Reps <- c(PhyloMammal_UN$tip.label[grepl("Rhinolophus imaizumii|Rhinolophus monoceros|Rhinolophus blythi|Rhinolophus perditus|Rhinolophus minor|Rhinolophus gracilis|Rhinolophus pumilus|Rhinolophus cornutus",
-#                                        PhyloMammal_UN$tip.label)], "Rhinolophus pusillus")
-# 
-# Reps <- paste(paste(substr(Reps, 1,1), ".", sep=""), word(Reps, 2), sep=" ")
-# 
-# par(mar=c(0,0,1,0), oma=c(0,1,1,1), family="sans")
-# par(mfrow=c(1,3))
-# 
-# # For the uncorrected tree
-# Rhinolophus <- drop.tip(PhyloMammal_UN, PhyloMammal_UN$tip.label[!grepl("Rhinolophus", PhyloMammal_UN$tip.label)])
-# Rhinolophus$tip.label <- paste(paste(substr(Rhinolophus$tip.label, 1,1), ".", sep=""), word(Rhinolophus$tip.label, 2), sep=" ")
-# plot(Rhinolophus,tip.color=ifelse(Rhinolophus$tip.label %in% Reps, ifelse(Rhinolophus$tip.label=="R. pusillus", "blue", "red"),"black"), 
-#      cex=1, label.offset=1,
-#      font=ifelse(Rhinolophus$tip.label %in% Reps, 4,3), main="A. Uncorrected",  node.depth=2) 
-# 
-# # For the corrected tree
-# Rhinolophus <- drop.tip(Phylo_Mammals, Phylo_Mammals$tip.label[!grepl("Rhinolophus", Phylo_Mammals$tip.label)])
-# Rhinolophus$tip.label <- paste(paste(substr(Rhinolophus$tip.label, 1,1), ".", sep=""), word(Rhinolophus$tip.label, 2), sep=" ")
-# plot(Rhinolophus,tip.color=ifelse(Rhinolophus$tip.label %in% Reps, ifelse(Rhinolophus$tip.label=="R. pusillus", "blue", "red"),"black"),
-#      cex=1, adj=0, label.offset=1,
-#      font=ifelse(Rhinolophus$tip.label %in% "R. pusillus", 4,3), main="B. Corrected", node.depth=2) 
-# 
-# # For the corrected tree after reducing replication
-# Rhinolophus <- drop.tip(Phylo_Mammals.final, Phylo_Mammals.final$tip.label[!grepl("Rhinolophus", Phylo_Mammals.final$tip.label)])
-# Rhinolophus$tip.label <- paste(paste(substr(Rhinolophus$tip.label, 1,1), ".", sep=""), word(Rhinolophus$tip.label, 2), sep=" ")
-# plot(Rhinolophus,tip.color=ifelse(Rhinolophus$tip.label %in% Reps, ifelse(Rhinolophus$tip.label=="R. pusillus", "blue", "red"),"black"),
-#      cex=1, adj=0, label.offset=1,
-#      font=ifelse(Rhinolophus$tip.label %in% "R. pusillus", 4,3), main="C. After removing replicated tips", node.depth=2) 
-# 
-# box("outer")
-# 
-# ## 2: Case study where the dropped tip is chosen randomly
-# # Uperodon taprobanicus (Kaloula pulchra, Kaloula taprobanica) 
-# Reps <- c(PhyloAmphibian_UN$tip.label[grepl("Kaloula pulchra|Kaloula taprobanica", PhyloAmphibian_UN$tip.label)],"Uperodon taprobanicus")
-# Reps <- paste(paste(substr(Reps, 1,2), ".", sep=""), word(Reps, 2), sep=" ")
-# 
-# par(mar=c(0,0,1,0), oma=c(0,1,1,1), family="sans")
-# par(mfrow=c(1,3))
-# # For the uncorrected tree
-# Uperodon <- drop.tip(PhyloAmphibian_UN, PhyloAmphibian_UN$tip.label[!grepl("Uperodon|Kaloula|Ramanella|Metaphrynella|Rhombophryne", PhyloAmphibian_UN$tip.label)])
-# Uperodon$tip.label <- paste(paste(substr(Uperodon$tip.label, 1,2), ".", sep=""), word(Uperodon$tip.label, 2), sep=" ")
-# plot(Uperodon,tip.color=ifelse(Uperodon$tip.label %in% Reps, "red","black"), cex=1, label.offset=1,
-#      font=ifelse(Uperodon$tip.label %in% Reps, 4,3), main="A. Uncorrected",  node.depth=2) 
-# 
-# # For the corrected tree
-# Uperodon <- drop.tip(Phylo_Amphibians, Phylo_Amphibians$tip.label[!grepl("Uperodon|Ramanella|Kaloula|Metaphrynella|Rhombophryne", Phylo_Amphibians$tip.label)])
-# Uperodon$tip.label <- paste(paste(substr(Uperodon$tip.label, 1,2), ".", sep=""), word(Uperodon$tip.label, 2), sep=" ")
-# plot(Uperodon,tip.color=ifelse(Uperodon$tip.label %in% "Up. taprobanicus", "blue","black"), cex=1, adj=0, label.offset=1,
-#      font=ifelse(Uperodon$tip.label %in% "Up. taprobanicus", 4,3), main="B. Corrected", node.depth=2) 
-# 
-# # For the corrected tree after removing replicated tips
-# Uperodon <- drop.tip(Phylo_Amphibians.final, Phylo_Amphibians.final$tip.label[!grepl("Uperodon|Ramanella|Kaloula|Metaphrynella|Rhombophryne", Phylo_Amphibians.final$tip.label)])
-# Uperodon$tip.label <- paste(paste(substr(Uperodon$tip.label, 1,2), ".", sep=""), word(Uperodon$tip.label, 2), sep=" ")
-# 
-# plot(Uperodon,tip.color=ifelse(Uperodon$tip.label %in% "Up. taprobanicus", "blue","black"), cex=1, adj=0, label.offset=1,
-#      font=ifelse(Uperodon$tip.label %in% "Up. taprobanicus", 4,3), main="C. After removing replicated tips", node.depth=2) 
-# box("outer")
+
+## Case 1: replicates are sister species
+# Phrynocephalus przewalskii
+Reps <- c(PhyloReptile_UN$tip.label[grepl("Phrynocephalus przewalskii", PhyloReptile_UN$tip.label)],"Phrynocephalus przewalskii")
+Reps <- paste(paste(substr(Reps, 1,2), ".", sep=""), word(Reps, 2), sep=" ")
+
+pdf(file="../../Results/Plots/Phylogenies/Case_studies/Case1.pdf", width=8, height=5, family="Times", pointsize=14)
+par(mar=c(0,0,1,0), oma=c(0,1,1,1), family="sans")
+par(mfrow=c(1,3))
+# For the uncorrected tree
+Phrynocephalus <- drop.tip(PhyloReptile_UN, PhyloReptile_UN$tip.label[!grepl("Phrynocephalus", PhyloReptile_UN$tip.label)])
+Phrynocephalus$tip.label <- paste(paste(substr(Phrynocephalus$tip.label, 1,2), ".", sep=""), word(Phrynocephalus$tip.label, 2), sep=" ")
+plot(Phrynocephalus,tip.color=ifelse(Phrynocephalus$tip.label %in% Reps, "blue",
+                                     ifelse(Phrynocephalus$tip.label %in% c("Ph. werneri", "Ph. potanini", "Ph. affinis", "Ph. elegans", 
+                                                                            "Ph. frontalis", "Ph. parvulus", "Ph. birulai", " Ph. suschkinianus"), 
+                                            "red", "black")), 
+     cex=1.2, label.offset=1,
+     font=ifelse(Phrynocephalus$tip.label %in% Reps, 4,
+                 ifelse(Phrynocephalus$tip.label %in% c("Ph. werneri", "Ph. potanini", "Ph. affinis", "Ph. elegans", 
+                                                        "Ph. frontalis", "Ph. parvulus", "Ph. birulai", " Ph. suschkinianus"), 4,3)), main="A. Uncorrected",  node.depth=2)
+
+# For the corrected tree
+Phrynocephalus <- drop.tip(Phylo_Reptiles, Phylo_Reptiles$tip.label[!grepl("Phrynocephalus", Phylo_Reptiles$tip.label)])
+Phrynocephalus$tip.label <- paste(paste(substr(Phrynocephalus$tip.label, 1,2), ".", sep=""), word(Phrynocephalus$tip.label, 2), sep=" ")
+plot(Phrynocephalus,tip.color=ifelse(Phrynocephalus$tip.label %in% "Ph. przewalskii", "blue","black"), cex=1.2, adj=0, label.offset=1,
+     font=ifelse(Phrynocephalus$tip.label %in% "Ph. przewalskii", 4,3), main="B. Corrected", node.depth=2)
+
+# For the corrected tree after removing replicated tips
+Phrynocephalus <- drop.tip(Phylo_Reptiles.final, Phylo_Reptiles.final$tip.label[!grepl("Phrynocephalus|Ramanella|Kaloula|Metaphrynella|Rhombophryne", Phylo_Reptiles.final$tip.label)])
+Phrynocephalus$tip.label <- paste(paste(substr(Phrynocephalus$tip.label, 1,2), ".", sep=""), word(Phrynocephalus$tip.label, 2), sep=" ")
+
+plot(Phrynocephalus,tip.color=ifelse(Phrynocephalus$tip.label %in% "Ph. przewalskii", "blue","black"), cex=1.2, adj=0, label.offset=1,
+     font=ifelse(Phrynocephalus$tip.label %in% "Ph. przewalskii", 4,3), main="C. After removing replicated tips", node.depth=2)
+box("outer")
+dev.off()
+
+## Case 2: not sister clades but the tip labels figures in the original tre
+
+pdf(file="../../Results/Plots/Phylogenies/Case_studies/Case2.pdf", width=8, height=5, family="Times", pointsize=14)
+
+Reps <- c(PhyloAmphibian_UN$tip.label[grepl("Ambystoma californiense|Ambystoma tigrinum", PhyloAmphibian_UN$tip.label)],"Ambystoma californiense")
+Reps <- paste(paste(substr(Reps, 1,2), ".", sep=""), word(Reps, 2), sep=" ")
+
+par(mar=c(0,0,1,0), oma=c(0,1,1,1), family="sans")
+par(mfrow=c(1,3))
+# For the uncorrected tree
+Ambystoma <- drop.tip(PhyloAmphibian_UN, PhyloAmphibian_UN$tip.label[!grepl("Ambystoma", PhyloAmphibian_UN$tip.label)])
+Ambystoma$tip.label <- paste(paste(substr(Ambystoma$tip.label, 1,2), ".", sep=""), word(Ambystoma$tip.label, 2), sep=" ")
+plot(Ambystoma,tip.color=ifelse(Ambystoma$tip.label %in% Reps, "red","black"), cex=1, label.offset=1,
+     font=ifelse(Ambystoma$tip.label %in% Reps, 4,3), main="A. Uncorrected",  node.depth=2)
+
+# For the corrected tree
+Ambystoma <- drop.tip(Phylo_Amphibians, Phylo_Amphibians$tip.label[!grepl("Ambystoma", Phylo_Amphibians$tip.label)])
+Ambystoma$tip.label <- paste(paste(substr(Ambystoma$tip.label, 1,2), ".", sep=""), word(Ambystoma$tip.label, 2), sep=" ")
+plot(Ambystoma,tip.color=ifelse(Ambystoma$tip.label %in% "Am. californiense", "blue","black"), cex=1, adj=0, label.offset=1,
+     font=ifelse(Ambystoma$tip.label %in% "Am. tigrinum", 4,ifelse(Ambystoma$tip.label %in% c("Am. californiense"), 4, 3)), main="B. Corrected", node.depth=2)
+
+# For the corrected tree after removing replicated tips
+Ambystoma <- drop.tip(Phylo_Amphibians.final, Phylo_Amphibians.final$tip.label[!grepl("Ambystoma", Phylo_Amphibians.final$tip.label)])
+Ambystoma$tip.label <- paste(paste(substr(Ambystoma$tip.label, 1,2), ".", sep=""), word(Ambystoma$tip.label, 2), sep=" ")
+
+plot(Ambystoma,tip.color=ifelse(Ambystoma$tip.label %in% "Am. californiense", "blue","black"), cex=1, adj=0, label.offset=1,
+     font=ifelse(Ambystoma$tip.label %in% "Am. tigrinum", 4,ifelse(Ambystoma$tip.label %in% c("Am. californiense"), 4, 3)), main="C. After removing replicated tips", node.depth=2)
+box("outer")
+
+dev.off()
+
+## 3: Case study where the dropped tip is chosen randomly; problematic cases when replicated tips are not sister clades
+# Hylopetes taprobanicus (Kaloula pulchra, Kaloula taprobanica)
+pdf(file="../../Results/Plots/Phylogenies/Case_studies/Case3.pdf", width=8, height=5, family="Times", pointsize=14)
+
+Reps <- c(PhyloMammal_UN$tip.label[grepl("Hylopetes lepidus|Petinomys sagitta",
+                                         PhyloMammal_UN$tip.label)], "Hylopetes sagitta")
+Reps <- paste(paste(substr(Reps, 1,2), ".", sep=""), word(Reps, 2), sep=" ")
+
+par(mar=c(0,0,1,0), oma=c(0,1,1,1), family="sans")
+par(mfrow=c(1,3))
+# For the uncorrected tree
+Hylopetes <- drop.tip(PhyloMammal_UN, PhyloMammal_UN$tip.label[!grepl("Hylopetes|Petinomys", PhyloMammal_UN$tip.label)])
+Hylopetes$tip.label <- paste(paste(substr(Hylopetes$tip.label, 1,2), ".", sep=""), word(Hylopetes$tip.label, 2), sep=" ")
+plot(Hylopetes,tip.color=ifelse(Hylopetes$tip.label %in% Reps, "red","black"), cex=1, label.offset=1,
+     font=ifelse(Hylopetes$tip.label %in% Reps, 4,3), main="A. Uncorrected",  node.depth=2)
+
+# For the corrected tree
+Hylopetes <- drop.tip(Phylo_Mammals, Phylo_Mammals$tip.label[!grepl("Hylopetes|Petinomys", Phylo_Mammals$tip.label)])
+Hylopetes$tip.label <- paste(paste(substr(Hylopetes$tip.label, 1,2), ".", sep=""), word(Hylopetes$tip.label, 2), sep=" ")
+plot(Hylopetes,tip.color=ifelse(Hylopetes$tip.label %in% "Hy. sagitta", "blue","black"), cex=1, adj=0, label.offset=1,
+     font=ifelse(Hylopetes$tip.label %in% "Pe. sagitta", 4,ifelse(Hylopetes$tip.label %in% "Hy. sagitta", 4, 3)), main="B. Corrected", node.depth=2)
+
+# For the corrected tree after removing replicated tips
+Hylopetes <- drop.tip(Phylo_Mammals.final, Phylo_Mammals.final$tip.label[!grepl("Hylopetes|Petinomys", Phylo_Mammals.final$tip.label)])
+Hylopetes$tip.label <- paste(paste(substr(Hylopetes$tip.label, 1,2), ".", sep=""), word(Hylopetes$tip.label, 2), sep=" ")
+
+plot(Hylopetes,tip.color=ifelse(Hylopetes$tip.label %in% "Hy. sagitta", "blue","black"), cex=1, adj=0, label.offset=1,
+     font=ifelse(Hylopetes$tip.label %in% "Pe. sagitta", 4,ifelse(Hylopetes$tip.label %in% "Hy. sagitta", 4, 3)), main="C. After removing replicated tips", node.depth=2)
+box("outer")
+dev.off()
 
 
-
+# # # DRAAAAAAFTS
 
 
 # # Plot distance range among replicated tips

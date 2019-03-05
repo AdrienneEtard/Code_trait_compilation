@@ -51,7 +51,7 @@ AE_Collected <- AE_Collected %>% Reprocess_diet()
 RC_Imputed$Primary_diet <- as.character(RC_Imputed$Primary_diet)
 AE_Imputed <- AE_Imputed %>% Reprocess_diet()
 
-# Body mass in kg
+# log 10 Body mass in kg
 RC_Collected$log10_Body_mass_kg <- log10(RC_Collected$Body_mass_g / 1000)
 RC_Imputed$log10_Body_mass_kg <- log10(RC_Imputed$Body_mass_g / 1000)
 AE_Collected$log10_Body_mass_kg <-log10(AE_Collected$Body_mass_g / 1000)
@@ -121,8 +121,15 @@ ggsave(p, file="../../Results/Plots/Comparison_with_RCooke/Comparison_imputed.pd
 
 
 ## 4.Imputed VS collected, collected VS imputed
-p1 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, FALSE, "log10_Body_mass_kg", FALSE, "BM, log10 ", "imputed", "imputed", TRUE, TRUE, FALSE) +
+# p1 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, FALSE, "log10_Body_mass_kg", FALSE, "BM, log10 ", "imputed", "imputed", TRUE, TRUE, FALSE) +
+#   labs(tag = "E") + theme(plot.tag.position = c(0.20, 0.94))
+
+p1 <- Compare(RC_Collected %>% mutate(Body_mass_g=Body_mass_g/1000), RC_Imputed %>% mutate(Body_mass_g=Body_mass_g/1000), AE_Collected %>% mutate(Body_mass_g=Body_mass_g/1000), AE_Imputed %>% mutate(Body_mass_g=Body_mass_g/1000), FALSE, "Body_mass_g", FALSE, "BM ", "imputed", "imputed", TRUE, TRUE, FALSE) +
   labs(tag = "E") + theme(plot.tag.position = c(0.20, 0.94))
+
+# AE_Imputedbis <- AE_Imputed %>% filter(Body_mass_g<=20000); AE_Collectedbis <- AE_Collected %>% filter(Body_mass_g<=20000)
+# p1bis <- Compare(RC_Collected %>% mutate(Body_mass_g=Body_mass_g/1000), RC_Imputed %>% mutate(Body_mass_g=Body_mass_g/1000), AE_Collectedbis %>% mutate(Body_mass_g=Body_mass_g/1000), AE_Imputedbis %>% mutate(Body_mass_g=Body_mass_g/1000), FALSE, "Body_mass_g", FALSE, "BM ", "imputed", "imputed", TRUE, TRUE, FALSE) +
+#   labs(tag = "E") + theme(plot.tag.position = c(0.20, 0.94))
 
 p2 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed,  FALSE, "Litter_size", FALSE, "LCS ", "imputed", "imputed", TRUE, TRUE, FALSE) +
   labs(tag = "C") + theme(plot.tag.position = c(0.20, 0.94))

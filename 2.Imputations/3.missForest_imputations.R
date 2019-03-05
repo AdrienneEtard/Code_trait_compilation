@@ -108,7 +108,7 @@ ArgumentsList <- list(TraitDF=DF.TraitsList,
 
 # Replicate this list N times so that: list with N elements, each of these are ArgumentsLists
 N <- 8
-To_impute_parallel_st <- rep(list(ArgumentsList_st), N)
+# To_impute_parallel_st <- rep(list(ArgumentsList_st), N)
 To_impute_parallel <- rep(list(ArgumentsList), N)
 
 rm(Mammals, Birds, Reptiles, Amphibians,
@@ -123,7 +123,7 @@ rm(Mammals, Birds, Reptiles, Amphibians,
 ## Export variables in all clusters
 clusterExport(cl=Cluster, list("Imputations_missForest",
                                "To_apply_parallel_imputations",
-                               "To_impute_parallel_st",
+                               #"To_impute_parallel_st",
                                "To_impute_parallel",
                                "%nin%"),
               envir=environment())

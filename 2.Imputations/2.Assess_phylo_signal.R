@@ -34,74 +34,76 @@ PhySignal <- function(Traitdata, Names, Phylo) {
     return(Signal)
 }
 
-# # Function to apply for categorical traits: PhySignal_Cat 
-# # TODO
-# PhySignal_Cat <- function(Traitdata, Names, Phylo) {
-#   
-#   # Traitdata=Mammals[,"Trophic_level"] %>% as.vector()
-#   # Names=Mammals$Best_guess_binomial
-#   # Phylo=Phylo_Mammals
-#   
-#   ## For the current trait, match and prune phylogeny
-#   names(Traitdata) <- Names
-#   Match <- match.phylo.data(Phylo, Traitdata)
-#   Phylo <- Match$phy
-#   Trait <- Match$data
-#   rm(Match)
-#   
-#   ## Fit different models of trait evolution and select model that best fits (model selection can be refined)
-#   ER_model <- fitDiscrete(Phylo, Trait, type="discrete", model="ER")
-#   ARD_model <- fitDiscrete(Phylo, Trait, type="discrete", model="ARD")
-#   SYM_model <- fitDiscrete(Phylo, Trait, type="discrete", model="SYM")
-#   
-#   # Select model that best fits based on AICc and log likelihood
-#   Model_selection <- as.data.frame(c(ER_model$opt$aicc, ARD_model$opt$aicc, SYM_model$opt$aicc))
-#   colnames(Model_selection) <- "AICc"
-#   row.names(Model_selection) <- c("ER", "ARD", "SYM")
-# 
-#   Model_selection$LogLk <- c(ER_model$opt$lnL, ARD_model$opt$lnL, SYM_model$opt$lnL)
-# 
-#   Model1 <- row.names(Model_selection[which.min(Model_selection$AICc),])
-#   Model2 <- row.names(Model_selection[which.max(Model_selection$LogLk),])
-#   
-#   if(Model1!=Model2) {print("Selection on both AICc and logLk: clash!")}
-#   
-#   else{
-#     
-#     print(paste("Model selected was", Model1))
-#     
-#     ## Rescale tree: lambda for a "0" tree
-#     Phylo_lambda_0 <- rescale(Phylo, model = "lambda", 0)
-#        
-#     # # To plot rescaled and non rescaled phylogenies:
-#     # par(mfrow=c(1,2))
-#     # plot(Phylo, edge.width = 1, show.tip.label = FALSE) #smaller tree
-#     # add.scale.bar(cex = 0.7, font = 2, col = "red")
-#     # plot(Phylo_lambda_0, edge.width = 1, show.tip.label = FALSE) #smaller tree
-#     # add.scale.bar(cex = 0.7, font = 2, col = "red")
-# 
-#     ## Fit lambda to the tree
-#     Lambda_trait <- fitDiscrete(Phylo, Trait, transform="lambda", type="discrete", model = Model1, niter=500)
-# 
-#     ## Fit lambda to the 0-rescaled tree
-#     Lambda_trait_0 <- fitDiscrete(Phylo_lambda_0, Trait, transform="lambda", type="discrete", model = Model1, niter=500)
-# 
-#     ## Compare the outputs: compare the null model to the non null model - log likelihood and AICc difference
-#     
-#     # AICc difference and log likelihood chi-square test
-#     AICc_diff <- abs(Lambda_trait_0$opt$aicc - Lambda_trait$opt$aicc)
-#     d_logLk <- abs(2*(Lambda_trait_0$opt$lnL - Lambda_trait$opt$lnL))
-#     p <- pchisq(d_logLk, 1, lower.tail=FALSE)
-# 
-#     if (p<0.05) {
-#         cat("Model significantly different from null")
-#     } else {cat("Model not significantly different from null")}
-# 
-#     Signal <- Lambda_trait$opt$lambda
-# 
-#     return(Signal)
-#     }
-# } 
+# Function to apply for categorical traits: PhySignal_Cat
+PhySignal_Cat <- function(Traitdata, Names, Phylo) {
+
+  # Traitdata=Mammals[,"Trophic_level"] %>% as.vector()
+  # Names=Mammals$Best_guess_binomial
+  # Phylo=Phylo_Mammals
+
+  ## For the current trait, match and prune phylogeny
+  names(Traitdata) <- Names
+  Match <- match.phylo.data(Phylo, Traitdata)
+  Phylo <- Match$phy
+  Trait <- Match$data
+  rm(Match)
+
+  ## Fit different models of trait evolution and select model that best fits (model selection can be refined)
+  ER_model <- fitDiscrete(Phylo, Trait, type="discrete", model="ER")
+  ARD_model <- fitDiscrete(Phylo, Trait, type="discrete", model="ARD")
+  SYM_model <- fitDiscrete(Phylo, Trait, type="discrete", model="SYM")
+
+  # Select model that best fits based on AICc and log likelihood
+  Model_selection <- as.data.frame(c(ER_model$opt$aicc, ARD_model$opt$aicc, SYM_model$opt$aicc))
+  colnames(Model_selection) <- "AICc"
+  row.names(Model_selection) <- c("ER", "ARD", "SYM")
+
+  Model_selection$LogLk <- c(ER_model$opt$lnL, ARD_model$opt$lnL, SYM_model$opt$lnL)
+
+  Model1 <- row.names(Model_selection[which.min(Model_selection$AICc),])
+  Model2 <- row.names(Model_selection[which.max(Model_selection$LogLk),])
+
+  if(Model1!=Model2) {print("Selection on both AICc and logLk: clash!")}
+
+  else{
+
+    print(paste("Model selected was", Model1))
+
+    ## Rescale tree: lambda for a "0" tree
+    Phylo_lambda_0 <- rescale(Phylo, model = "lambda", 0)
+
+    # # To plot rescaled and non rescaled phylogenies:
+    # par(mfrow=c(1,2))
+    # plot(Phylo, edge.width = 1, show.tip.label = FALSE) #smaller tree
+    # add.scale.bar(cex = 0.7, font = 2, col = "red")
+    # plot(Phylo_lambda_0, edge.width = 1, show.tip.label = FALSE) #smaller tree
+    # add.scale.bar(cex = 0.7, font = 2, col = "red")
+
+    ## Fit lambda to the tree
+    Lambda_trait <- fitDiscrete(Phylo, Trait, transform="lambda", type="discrete", model = Model1, niter=500)
+
+    ## Fit lambda to the 0-rescaled tree
+    Lambda_trait_0 <- fitDiscrete(Phylo_lambda_0, Trait, transform="lambda", type="discrete", model = Model1, niter=500)
+
+    ## Compare the outputs: compare the null model to the non null model - log likelihood and AICc difference
+
+    # AICc difference and log likelihood chi-square test
+    AICc_diff <- abs(Lambda_trait_0$opt$aicc - Lambda_trait$opt$aicc)
+    d_logLk <- abs(2*(Lambda_trait_0$opt$lnL - Lambda_trait$opt$lnL))
+    p <- pchisq(d_logLk, 1, lower.tail=FALSE)
+
+    if (p<0.05) {
+        cat("Model significantly different from null")
+    } else {cat("Model not significantly different from null")}
+
+    Lambda <- Lambda_trait$opt$lambda
+    pvalue <- p
+    
+    List <- list(Lambda=Lambda, AICc_diff=AICc_diff, d_logLk=d_logLk, pvalue=pvalue)
+
+    return(unlist(List))
+    }
+}
 
 
 # Read trait data
@@ -135,6 +137,15 @@ Names.Birds <- Birds$Best_guess_binomial
 Names.Reptiles <- Reptiles$Best_guess_binomial
 Names.Amphibians <- Amphibians$Best_guess_binomial
 
+# Make sure that BL information is included for reptiles
+#Phylo_Reptiles <- compute.brlen(Phylo_Reptiles)
+# Rep_BM <- PhySignal(Reptiles$Body_mass_g, Reptiles$Best_guess_binomial, Phylo_Reptiles)
+# Rep_L <- PhySignal(Reptiles$Longevity_d, Reptiles$Best_guess_binomial, Phylo_Reptiles)
+#Rep_LCS <- PhySignal(Reptiles$Litter_size, Reptiles$Best_guess_binomial, Phylo_Reptiles)
+# Rep_BM <- PhySignal(Reptiles$Body_mass_g, Reptiles$Best_guess_binomial, Phylo_Reptiles)
+# write.csv(as.data.frame(Rep_BM), "../../Results/1.Traits_before_imputations/Phylogenetic_signal/BM_reptile.csv",row.names = FALSE)
+# write.csv(as.data.frame(Rep_L), "../../Results/1.Traits_before_imputations/Phylogenetic_signal/L_reptile.csv",row.names = FALSE)
+
 
 ## Export variables in all clusters
 clusterExport(cl=Cluster, list(".Format_tiplabels","PhySignal", #"PhySignal_Cat",
@@ -147,10 +158,23 @@ clusterExport(cl=Cluster, list(".Format_tiplabels","PhySignal", #"PhySignal_Cat"
 ## PARALLEL CALCULATIONS WITH parApply
 
 # Phylogenetic signal in continuous traits
-Lambda_Mammals_continuous <- parApply(Cluster, Mammals[, c(Continuous.Traits,"Generation_length_d", "Adult_svl_cm")], 2, PhySignal, Names=Names.Mammals, Phylo=Phylo_Mammals) %>% as.data.frame()
-Lambda_Birds_continuous <- parApply(Cluster, Birds[, c(Continuous.Traits, "Generation_length_d")], 2, PhySignal, Names=Names.Birds, Phylo=Phylo_Birds) %>% as.data.frame()
-Lambda_Reptiles_continuous <- parApply(Cluster, Reptiles[, c(Continuous.Traits,"Adult_svl_cm", "Maturity_d")], 2, PhySignal, Names=Names.Reptiles, Phylo=Phylo_Reptiles) %>% as.data.frame()
-Lambda_Amphibians_continuous <- parApply(Cluster, Amphibians[, c(Continuous.Traits, "Body_length_mm")], 2, PhySignal, Names=Names.Amphibians, Phylo=Phylo_Amphibians) %>% as.data.frame()
+# start_time <- Sys.time()
+# Lambda_Mammals_continuous <- parApply(Cluster, Mammals[, c(Continuous.Traits,"Generation_length_d", "Adult_svl_cm")], 2, PhySignal, Names=Names.Mammals, Phylo=Phylo_Mammals) %>% as.data.frame()
+# end_time <- Sys.time()
+# end_time-start_time
+# 
+# start_time <- Sys.time()
+# Lambda_Amphibians_continuous <- parApply(Cluster, Amphibians[, c(Continuous.Traits, "Body_length_mm")], 2, PhySignal, Names=Names.Amphibians, Phylo=Phylo_Amphibians) %>% as.data.frame()
+# end_time <- Sys.time()
+# end_time-start_time
+
+# RC <- Continuous.Traits[-which(Continuous.Traits=="Diet_breadth")]
+# start_time <- Sys.time()
+# Lambda_Reptiles_continuous <- parApply(Cluster, Reptiles[, c(RC, "Adult_svl_cm", "Maturity_d")], 2, PhySignal, Names=Names.Reptiles, Phylo=Phylo_Reptiles) %>% as.data.frame()
+# end_time <- Sys.time()
+# end_time-start_time
+
+# Lambda_Birds_continuous <- parApply(Cluster, Birds[, c(Continuous.Traits, "Generation_length_d")], 2, PhySignal, Names=Names.Birds, Phylo=Phylo_Birds) %>% as.data.frame()
 
 # # Phylogenetic signal in categorical traits
 # Lambda_Mammals_categorical <- parApply(Cluster, Mammals[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Mammals, Phylo=Phylo_Mammals)
@@ -161,9 +185,9 @@ Lambda_Amphibians_continuous <- parApply(Cluster, Amphibians[, c(Continuous.Trai
 
 ## Save files
 # write.csv(Lambda_Mammals_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousMammals.csv",row.names = FALSE)
-write.csv(Lambda_Birds_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousBirds.csv",row.names = FALSE)
-write.csv(Lambda_Reptiles_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousReptiles.csv",row.names = FALSE)
-write.csv(Lambda_Amphibians_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousAmphibians.csv",row.names = FALSE)
+# write.csv(Lambda_Birds_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousBirds.csv",row.names = FALSE)
+# write.csv(Lambda_Reptiles_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousReptiles.csv",row.names = FALSE)
+# write.csv(Lambda_Amphibians_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/ContinuousAmphibians2.csv",row.names = FALSE)
 
 
 ## DESTROY CLUSTER
