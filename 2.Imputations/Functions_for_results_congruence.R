@@ -73,7 +73,7 @@ Plot.Congruence.Continuous <- function(All_results, Collected, isDB) {
   BM <- Congruence(All_results, Collected, "Body_mass_g")
   RS <- Congruence(All_results, Collected, "Range_size_m2")
 
-  # Change units: BM -> kg; longevity -> years; RS -> km2
+  # Change units: BM -> kg; longevity -> years; RS -> Mm2
   BM[, c(2:9)] <-  BM[, c(2:9)]/1000
   RS[, c(2:9)] <-  RS[, c(2:9)]/1000000000000
   LG[, c(2:9)] <-  LG[, c(2:9)]/365.25

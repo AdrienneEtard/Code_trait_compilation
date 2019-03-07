@@ -1,3 +1,5 @@
+## Functions from Borges et al 2018
+
 library("ape")
 library("expm")
 
@@ -7,7 +9,17 @@ library("expm")
 
 nentropy <- function(prob) {
   
-  k              <- ncol(prob)                       #number of states
+  # browser()
+  
+  k              <- ncol(prob) 
+  
+  ## I tweaked the function here ## otherwise it was crashing!!!! when prob has imaginary parts...
+  if(class(prob[1,1])=="complex") {
+  prob <- Re(prob)
+  }
+  ## end of tweak
+  
+  #number of states
   prob[prob>1/k] <- prob[prob>1/k]/(1-k) - 1/(1-k)   #state entropies
   tent           <- apply(prob,1,sum)                #node entropy
   
@@ -179,6 +191,8 @@ rtrait <- function(tree,R,nstates) {
 #calculate delta statistic
 #trait: trait vector 
 delta <- function(trait, tree,lambda0,se,sim,thin,burn) {
+  
+  # browser()
   
   ar <- ace(trait,tree,type="discret",method="ML",model="ARD")$lik.anc
   x  <- nentropy(ar)

@@ -219,7 +219,8 @@ par(mfrow=c(1,3))
 # For the uncorrected tree
 Ambystoma <- drop.tip(PhyloAmphibian_UN, PhyloAmphibian_UN$tip.label[!grepl("Ambystoma", PhyloAmphibian_UN$tip.label)])
 Ambystoma$tip.label <- paste(paste(substr(Ambystoma$tip.label, 1,2), ".", sep=""), word(Ambystoma$tip.label, 2), sep=" ")
-plot(Ambystoma,tip.color=ifelse(Ambystoma$tip.label %in% Reps, "red","black"), cex=1, label.offset=1,
+plot(Ambystoma,tip.color=ifelse(Ambystoma$tip.label == Reps[2], "blue", 
+                                ifelse(Ambystoma$tip.label == Reps[1], "red", "black")), cex=1, label.offset=1,
      font=ifelse(Ambystoma$tip.label %in% Reps, 4,3), main="A. Uncorrected",  node.depth=2)
 
 # For the corrected tree
