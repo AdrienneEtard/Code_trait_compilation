@@ -1,4 +1,5 @@
 # Imputations using missForest, with  phylogenetic eigenvectors as predictors
+## Here for phylogenetic infomormation extracted from original phylogenies, untouched
 
 # still to do:
 # compare results from missForest imputations with results from phylogenetic imputations - at least for continuous traits?
@@ -35,10 +36,11 @@ source("Functions_for_missForest_imputations.R")
 # Reptiles_st <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/4.transformed_traits/Reptiles.csv")
 
 ## Load trait data: NOT transformed and NOT standardised, with phylogenetic imformation as eigenvectors
-Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
-Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Birds.csv")
-Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
-Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
+## chnage here
+Mammals <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/corrected_datasets_but_uncorrected_phylogenies/Mammals.csv")
+Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/corrected_datasets_but_uncorrected_phylogenies/Birds.csv")
+Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/corrected_datasets_but_uncorrected_phylogenies/Amphibians.csv")
+Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/corrected_datasets_but_uncorrected_phylogenies/Reptiles.csv")
 
 
 ## Define variables for imputations
@@ -55,11 +57,11 @@ Taxinfo <- "Order"
 #                   "Range_size_m2", "sqrt_Habitat_breadth_IUCN")
 
 Traits_cont <-  c("Body_mass_g", "Longevity_d", "Litter_size", "Diet_breadth",
-                     "Range_size_m2", "Habitat_breadth_IUCN")
+                  "Range_size_m2", "Habitat_breadth_IUCN")
 
 Traits_cat <- c(Habitat, "Specialisation",      
-               "Diel_activity","Trophic_level", Diet, "Primary_diet")
-               
+                "Diel_activity","Trophic_level", Diet, "Primary_diet")
+
 
 ## Add some traits for each taxon
 # MammalsCont_st <- c(Traits_cont_st, "log10_Generation_length_d", "log10_Adult_svl_cm")
@@ -98,13 +100,13 @@ std.List <- list(M=FALSE, B=FALSE, R=FALSE, A=FALSE)
 # 					            std=std.List_st)
 
 ArgumentsList <- list(TraitDF=DF.TraitsList,
-                         Taxinfo=Taxinfo.List,
-                         Traits_cont=Cont.TraitsList,
-                         Traits_cat=Cat.TraitsList,
-                         EV=EV.List,
-                         ErrorTrue=ErrorTrue.List,
-                         DietTRUE=DietTRUE.List, 
-                         std=std.List)
+                      Taxinfo=Taxinfo.List,
+                      Traits_cont=Cont.TraitsList,
+                      Traits_cat=Cat.TraitsList,
+                      EV=EV.List,
+                      ErrorTrue=ErrorTrue.List,
+                      DietTRUE=DietTRUE.List, 
+                      std=std.List)
 
 # Replicate this list N times so that: list with N elements, each of these are ArgumentsLists
 N <- 8
@@ -113,12 +115,12 @@ To_impute_parallel <- rep(list(ArgumentsList), N)
 
 rm(Mammals, Birds, Reptiles, Amphibians,
    Mammals_st, Birds_st, Reptiles_st, Amphibians_st, 
-	Habitat, Diet, Taxinfo, Traits_cont, Traits_cat, Traits_cont_st, 
-	MammalsCont, BirdsCont, ReptilesCont, AmphibiansCont,
-	MammalsCont_st, BirdsCont_st, ReptilesCont_st, AmphibiansCont_st,
-	DF.TraitsList, DF.TraitsList_st, Taxinfo.List, Cont.TraitsList, Cat.TraitsList, Cont.TraitsList_st,
-	EV.List, ErrorTrue.List, DietTRUE.List, N, std.List, std.List_st,
-	ArgumentsList, ArgumentsList_st)
+   Habitat, Diet, Taxinfo, Traits_cont, Traits_cat, Traits_cont_st, 
+   MammalsCont, BirdsCont, ReptilesCont, AmphibiansCont,
+   MammalsCont_st, BirdsCont_st, ReptilesCont_st, AmphibiansCont_st,
+   DF.TraitsList, DF.TraitsList_st, Taxinfo.List, Cont.TraitsList, Cat.TraitsList, Cont.TraitsList_st,
+   EV.List, ErrorTrue.List, DietTRUE.List, N, std.List, std.List_st,
+   ArgumentsList, ArgumentsList_st)
 
 ## Export variables in all clusters
 clusterExport(cl=Cluster, list("Imputations_missForest",
@@ -136,12 +138,12 @@ clusterExport(cl=Cluster, list("Imputations_missForest",
 
 print("Imputations on non-tranformed/standardised data")
 system.time(Imputed_sets <- parLapply(cl=Cluster,
-                             X=To_impute_parallel,
-                             fun=To_apply_parallel_imputations))
+                                      X=To_impute_parallel,
+                                      fun=To_apply_parallel_imputations))
 
 ## Save results
 # saveRDS(Imputed_sets_st, "../../Results/2.imputed_trait_datasets/Imputed_on_standardised/List_of_8_sets.rds")
-saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/Imputed_not_standardised/List_of_8_sets.rds")
+saveRDS(Imputed_sets, "../../Results/2.imputed_trait_datasets/Imputed_original_trees/List_of_8_sets.rds")
 
 ## DESTROY CLUSTER
 stopCluster(Cluster)

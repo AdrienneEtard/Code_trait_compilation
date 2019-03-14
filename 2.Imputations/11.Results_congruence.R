@@ -6,7 +6,7 @@ library(ggpubr)
 source("Functions_for_results_congruence.R")
 
 ## Load imputed datasets (8)
-Imputed <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_not_standardised/List_of_8_sets.rds")
+Imputed <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_corrected_trees/List_of_8_sets.rds")
 
 ## Load data before imputations
 Coll_Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
@@ -79,5 +79,39 @@ ggsave(pPD, file="../../Results/Plots/Congruence_imputations/Categorical/PD.pdf"
 rm(pA,pR,pM,pB, pDA,pSp,pTL,pPD)
 
 
+## Summarise congruence for categorical traits into one plot
+Cat_traits_congruence <- rbind(
+  GetCatCongruence(All_Mammals, Coll_Mammals, c("Diel_activity", "Trophic_level", "Specialisation", "Primary_diet"), "Mammals"), 
+  GetCatCongruence(All_Birds, Coll_Birds, c("Diel_activity", "Trophic_level", "Specialisation", "Primary_diet"), "Birds"),
+  GetCatCongruence(All_Reptiles, Coll_Reptiles, c("Diel_activity", "Trophic_level", "Specialisation", "Primary_diet"), "Reptiles"),
+  GetCatCongruence(All_Amphibians, Coll_Amphibians, c("Diel_activity", "Trophic_level", "Specialisation", "Primary_diet"), "Amphibians")
+)
+ 
 
+Cat_traits_congruence$Agreement[12] <- NA
+
+## plot final plot for agreement in categorical traits
+pCat <- Plot_Cat_congruence(Cat_traits_congruence) + scale_y_discrete(limits=c("Primary_diet", "Specialisation", "Diel_activity", "Trophic_level"),
+                                                              labels=c("PD", "Sp", "DA", "TL"))
+ggsave(pCat, filename = "../../Results/Plots/Congruence_imputations/Categorical/Summary_plot.pdf", height = 3, width = 5)
+
+
+## Summarise congruence for continuous traits with Pearsons's correlation coefficients
+TR <- c("Body_mass_g", "Litter_size", "Habitat_breadth_IUCN", "Diet_breadth", "Longevity_d", "Range_size_m2")
+
+Cont_traits_congruence <- rbind(
+  Correlation_coeff_imputations(All_Mammals, Coll_Mammals, TR, Class="Mammals"),
+  Correlation_coeff_imputations(All_Birds, Coll_Birds, TR, Class="Birds"),
+  Correlation_coeff_imputations(All_Reptiles, Coll_Reptiles, TR, Class="Reptiles"),
+  Correlation_coeff_imputations(All_Amphibians, Coll_Amphibians, TR, Class="Amphibians")
+)
+Cont_traits_congruence[16, c(1:3)] <- NA
+
+pCont <- Plot_Cont_congruence(Cont_traits_congruence) 
+ggsave(pCont, filename = "../../Results/Plots/Congruence_imputations/Continuous/Summary_plot.pdf", height = 3, width = 5)
+
+p2 <- ggarrange(pCat + labs(tag = "A") + theme(plot.tag.position = "topleft"),
+               pCont+ labs(tag = "B")+ theme(plot.tag.position = "topleft"),
+               common.legend=TRUE, legend = "right")
+ggsave(p2, filename = "../../Results/Plots/Congruence_imputations/Summary.pdf", height = 3, width = 8.5)
 

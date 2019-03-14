@@ -4,9 +4,10 @@
 
 # # #   P  R  E  A  M  B  L  E
 
-X <- c("dplyr", "ggplot2", "ggpubr", "grid", "cowplot")
+X <- c("dplyr", "ggplot2", "ggpubr", "grid", "cowplot", "phytools", "picante")
 lapply(X, library, character.only=TRUE); rm(X)
 source("Comparison_with_without_taxonomic_corrections_functions.R")
+source("Functions_for_phylogenies.R")
 
 ## Load trait files
 
@@ -27,6 +28,33 @@ UN_Predicts <- readRDS("../../Data/PREDICTS_database.rds") %>%
   filter(Class %in% c("Aves", "Mammalia", "Reptilia", "Amphibia"))
 
 C_Predicts <- readRDS("../../Results/0.Data_resolved_taxonomy/Processed_datasets/PredictsVertebrates.rds")
+
+## Phylogenies after taxonomic corrections, without random additions -- to modify EV1
+Phylo_Mammals <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloMammals.nwk")  %>% .Format_tiplabels()
+Phylo_Birds <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloBirds.nwk")  %>% .Format_tiplabels() 
+Phylo_Amphibians <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloAmphibians.nwk")  %>% .Format_tiplabels() 
+Phylo_Reptiles <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloReptiles.nwk")  %>% .Format_tiplabels() 
+
+EV_corrected <- function(TraitDF, Phylo) {
+  
+  EV <- TraitDF$EV_1
+  Names=TraitDF$Best_guess_binomial
+  names(EV) <- Names
+  Match = match.phylo.data(Phylo, EV)
+  Phylo <- Match$phy
+  EV <- Match$data
+  TraitDF$EV_1 <- NA
+  
+  for (i in 1:length(EV)) {
+    TraitDF$EV_1[TraitDF$Best_guess_binomial==names(EV)[i]] <- 1
+  }
+   return(TraitDF)
+}
+
+C_Amphibians_NoAdd <- EV_corrected(C_Amphibians, Phylo_Amphibians)
+C_Mammals_NoAdd <- EV_corrected(C_Mammals, Phylo_Mammals)
+C_Reptiles_NoAdd <- EV_corrected(C_Reptiles, Phylo_Reptiles)
+C_Birds_NoAdd <- EV_corrected(C_Birds, Phylo_Birds)
 
 
 ## 1. Differences in species number
@@ -51,10 +79,10 @@ Delta_Number(UN_Reptiles, C_Reptiles, "Reptilia", "Predicts", C_Predicts, UN_Pre
 ## 2. Plotting coverage
 
 # 2.1. % Species representation in phylogenies
-CovPhyloAll <- Phylo_Delta(C_Mammals, C_Birds, C_Reptiles, C_Amphibians, C_Predicts, FALSE,
+CovPhyloAll <- Phylo_Delta(C_Mammals_NoAdd, C_Birds_NoAdd, C_Reptiles_NoAdd, C_Amphibians_NoAdd, C_Predicts, FALSE,
                            UN_Mammals, UN_Birds, UN_Reptiles, UN_Amphibians, UN_Predicts)
 
-CovPhyloPredicts <- Phylo_Delta(C_Mammals, C_Birds, C_Reptiles, C_Amphibians, C_Predicts, TRUE,
+CovPhyloPredicts <- Phylo_Delta(C_Mammals_NoAdd, C_Birds_NoAdd, C_Reptiles_NoAdd, C_Amphibians_NoAdd, C_Predicts, TRUE,
                                 UN_Mammals, UN_Birds, UN_Reptiles, UN_Amphibians, UN_Predicts)
 
 p <- PlotPhyloCov(CovPhyloAll,CovPhyloPredicts, 15)

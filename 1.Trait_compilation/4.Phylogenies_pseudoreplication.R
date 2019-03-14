@@ -1,6 +1,5 @@
+## Assessing changes in number of species due to additions 
 ## Treating pseudo-replication in phylogenetic tips
-
-# TODO compute.brlen before plotting?
 
 
 # # # # P r e a m b l e 
@@ -27,34 +26,8 @@ UN_Predicts <- readRDS("../../Data/PREDICTS_database.rds") %>%
   filter(Class %in% c("Aves", "Mammalia", "Reptilia", "Amphibia"))
 C_Predicts <- readRDS("../../Results/0.Data_resolved_taxonomy/Processed_datasets/PredictsVertebrates.rds")
 
-## Load phylogenies
+## Load phylogenies with species that have been added randomly at genus level
 
-# # Either these files, to add species to genus
-# # uncorrected
-# PhyloMammal_UN <- read.newick("../../Data/Mammals/Phylogenies/TTOL_mammals_smoothed_interpolated.nwk")
-# PhyloAmphibian_UN <- read.newick("../../Data/Phylogenies/TTOL_amphibians_unsmoothed_Hedges2015.nwk")
-# PhyloBird_UN <- read.newick("../../Data/Phylogenies/TTOL_birds_smoothed_interpolated_Hedges2015.nwk")
-# PhyloReptile_UN <- read.newick("../../Data/Phylogenies/TTOL_squamates_unsmoothed_Hedges2015.nwk")
-# 
-# # corrected
-# Phylo_Mammals_C <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloMammals.nwk")
-# Phylo_Amphibians_C <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloAmphibians.nwk")
-# Phylo_Reptiles_C <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloReptiles.nwk")
-# Phylo_Birds_C <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloBirds.nwk")
-# 
-# # ## If problem when opening bird phylogeny -- run these lines
-# # source("../0.Prerequisites/Resolve_taxonomy_functions.R")
-# # PhyloB <- read.newick("../../Data/Phylogenies/TTOL_birds_smoothed_interpolated_Hedges2015.nwk") %>% .Format_tiplabels()
-# # Syn_birds <- read.csv("../../Results/0.Data_resolved_taxonomy/List_species_synonyms/Synonym_final_datasets/Birds.csv")
-# # Phylo_Birds_C <- Replace_by_accepted_name(Syn_birds, PhyloB)
-# # write.tree(Phylo_Birds_C, "../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloBirds.nwk")
-# # Phylo_Birds_C <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloBirds.nwk")
-# # rm(PhyloB, Syn_birds)
-
-
-## Or these files, after species have been attached 
-
-## Load data (from above commented script: phylogenies with ramdom addition of species at the genus level)
 # corrected
 Phylo_Mammals <- read.newick("../../Results/1.Phylogenies/Corrected/1.Random_additions/Mammals.nwk") %>% .Format_tiplabels()
 Phylo_Birds <- read.newick("../../Results/1.Phylogenies/Corrected/1.Random_additions/Birds.nwk") %>% .Format_tiplabels()
@@ -68,47 +41,22 @@ PhyloBird_UN <- read.newick("../../Results/1.Phylogenies/Uncorrected/1.Random_ad
 PhyloReptile_UN <- read.newick("../../Results/1.Phylogenies/Uncorrected/1.Random_additions/Reptiles.nwk") %>% .Format_tiplabels()
 
 
+## Load phylogenies without the random additions
+# corrected - all ultrametric, with BL, all binary (resolved) except Amphibians
+Phylo_Mammals_C_Ori <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloMammals.nwk") %>% .Format_tiplabels()
+Phylo_Amphibians_C_Ori <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloAmphibians.nwk") %>% .Format_tiplabels()
+Phylo_Reptiles_C_Ori <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloReptiles.nwk") %>% .Format_tiplabels()
+Phylo_Birds_C_Ori <- read.newick("../../Results/0.Data_resolved_taxonomy/Processed_datasets/Phylogenies/PhyloBirds.nwk") %>% .Format_tiplabels()
 
-# # # # #
 
-# ## 1. Randomly attach species not present in the phylogenies to their genuses when applicable, for both corrected and uncorrected datasets
-# 
-# ## Corrected datasets
-# C.ResMammals <- SpeciesPhylo(C_Predicts, C_Mammals, Phylo_Mammals_C, "Mammalia", "random")
-# C.ResAmphibians <- SpeciesPhylo(C_Predicts, C_Amphibians, Phylo_Amphibians_C, "Amphibia","random")
-# C.ResReptiles <- SpeciesPhylo(C_Predicts, C_Reptiles, Phylo_Reptiles_C, "Reptilia","random")
-# C.ResBirds <- SpeciesPhylo(C_Predicts, C_Birds, Phylo_Birds_C, "Aves","random")
-# 
-# ## Uncorrected datasets
-# UN.ResMammals <- SpeciesPhylo(UN_Predicts, UN_Mammals, PhyloMammal_UN, "Mammalia", "random")
-# UN.ResAmphibians <- SpeciesPhylo(UN_Predicts,UN_Amphibians, PhyloAmphibian_UN, "Amphibia","random")
-# UN.ResReptiles <- SpeciesPhylo(UN_Predicts, UN_Reptiles, PhyloReptile_UN, "Reptilia","random")
-# UN.ResBirds <- SpeciesPhylo(UN_Predicts, UN_Birds, PhyloBird_UN, "Aves","random")
-# 
-# ## Save these phylogenies with attached genus
-# C.Phylo_Mammals <- C.ResMammals$Phylo %>% .Format_tiplabels()
-# C.Phylo_Amphibians <- C.ResAmphibians$Phylo %>% .Format_tiplabels()
-# C.Phylo_Reptiles <- C.ResReptiles$Phylo %>% .Format_tiplabels()
-# C.Phylo_Birds <- C.ResBirds$Phylo %>% .Format_tiplabels()
-# 
-# UN.Phylo_Mammals <- UN.ResMammals$Phylo %>% .Format_tiplabels()
-# UN.Phylo_Amphibians <- UN.ResAmphibians$Phylo %>% .Format_tiplabels()
-# UN.Phylo_Reptiles <- UN.ResReptiles$Phylo %>% .Format_tiplabels()
-# UN.Phylo_Birds <- UN.ResBirds$Phylo %>% .Format_tiplabels()
-# 
-# write.tree(C.Phylo_Amphibians, "../../Results/1.Phylogenies/Corrected/1.Random_additions/Amphibians.nwk")
-# write.tree(C.Phylo_Reptiles, "../../Results/1.Phylogenies/Corrected/1.Random_additions/Reptiles.nwk")
-# write.tree(C.Phylo_Birds, "../../Results/1.Phylogenies/Corrected/1.Random_additions/Birds.nwk")
-# write.tree(C.Phylo_Mammals, "../../Results/1.Phylogenies/Corrected/1.Random_additions/Mammals.nwk")
-# 
-# write.tree(UN.Phylo_Amphibians, "../../Results/1.Phylogenies/Uncorrected/1.Random_additions/Amphibians.nwk")
-# write.tree(UN.Phylo_Reptiles, "../../Results/1.Phylogenies/Uncorrected/1.Random_additions/Reptiles.nwk")
-# write.tree(UN.Phylo_Birds, "../../Results/1.Phylogenies/Uncorrected/1.Random_additions/Birds.nwk")
-# write.tree(UN.Phylo_Mammals, "../../Results/1.Phylogenies/Uncorrected/1.Random_additions/Mammals.nwk")
+## 1. Changes in species number due to random additions (here for corrected datasets)
+DeltaNspecies(Phylo_Mammals_C_Ori, Phylo_Mammals, C_Mammals) 
+DeltaNspecies(Phylo_Amphibians_C_Ori, Phylo_Amphibians, C_Amphibians) 
+DeltaNspecies(Phylo_Reptiles_C_Ori, Phylo_Reptiles, C_Reptiles) 
+DeltaNspecies(Phylo_Birds_C_Ori, Phylo_Birds, C_Birds) 
 
 
 ## 2. Looking at replicated tips, and dropping replicated tips -- JUST FOR CORRECTED PHYLOGENIES. 
-
 
 ## 2.1. Drop tips 
 

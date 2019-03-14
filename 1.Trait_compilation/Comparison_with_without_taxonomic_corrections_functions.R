@@ -270,7 +270,7 @@ Plot.Delta.Cov <- function(TraitData1, TraitData2, Traits_name, PredictsTrue, Pr
   title(main=Main, adj=0)
   
   abline(v=100, lty="dotted")
-
+  abline(v=50, lty="dotted")
   
 }
 

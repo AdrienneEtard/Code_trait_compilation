@@ -123,11 +123,20 @@
   
   # Vidan reptiles (diel activity)
   colnames(Vidan)[2] <- "Diel_activity"
+  Vidan$Diel_activity <- as.character(Vidan$Diel_activity)
+  Vidan$Diel_activity[Vidan$Diel_activity=="Diurnal"] <- "Other"
+  Vidan$Diel_activity[Vidan$Diel_activity=="Cathemeral"] <- "Other"
   
   # Stark reptiles: diel activity; max longevity; mean BM; 
   Traits.Stark <- c("Max_longevity_d", "Diel_activity", "Body_mass_g", "Litter_size")
   colnames(Stark)[c(4, 9, 16, 17)] <- Traits.Stark
   Stark$Max_longevity_d <- Stark$Max_longevity_d * 365.25
+  Stark$Diel_activity <- as.character(Stark$Diel_activity)
+  Stark$Diel_activity [Stark$Diel_activity=="Diurnal"] <- "Other"
+  Stark$Diel_activity [Stark$Diel_activity=="Crepuscular "] <- "Other"
+  Stark$Diel_activity [Stark$Diel_activity=="Crepuscular"] <- "Other"
+  Stark$Diel_activity [Stark$Diel_activity=="Cathemeral"] <- "Other"
+  Stark$Diel_activity [Stark$Diel_activity==""] <- NA
   
   # Schwarz: clutch size
   colnames(Schwarz)[5] <- "Litter_size"
@@ -156,6 +165,9 @@
   Meiri$Trophic_level[Meiri$Trophic_level=="Carnivorous"] <- "Carnivore"
   Meiri$Trophic_level[Meiri$Trophic_level=="Omnivorous"] <- "Omnivore"
   Meiri$Trophic_level[Meiri$Trophic_level=="Herbivorous"] <- "Herbivore"
+  Meiri$Diel_activity <- as.character(Meiri$Diel_activity)
+  Meiri$Diel_activity [Meiri$Diel_activity=="Cathemeral"] <- "Other"
+  Meiri$Diel_activity [Meiri$Diel_activity=="Diurnal"] <- "Other"
   
   # Butchart Avian body mass
   colnames(Butchart_BM)[29] <- "Body_mass_g"

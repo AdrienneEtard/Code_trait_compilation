@@ -9,15 +9,7 @@ library("expm")
 
 nentropy <- function(prob) {
   
-  # browser()
-  
   k              <- ncol(prob) 
-  
-  ## I tweaked the function here ## otherwise it was crashing!!!! when prob has imaginary parts...
-  if(class(prob[1,1])=="complex") {
-  prob <- Re(prob)
-  }
-  ## end of tweak
   
   #number of states
   prob[prob>1/k] <- prob[prob>1/k]/(1-k) - 1/(1-k)   #state entropies

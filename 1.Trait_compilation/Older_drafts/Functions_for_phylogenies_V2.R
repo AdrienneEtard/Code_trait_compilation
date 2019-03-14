@@ -1,11 +1,3 @@
-## Function to format phylogeny tip labels (from Genus_species to Genus species format)
-.Format_tiplabels <- function (Phylogeny) {
-  Phylogeny$tip.label <- gsub("_", " ", Phylogeny$tip.label)
-  # Phylogeny$tip.label <- lapply(Phylogeny$tip.label, function(x) word(x, 1, 2)) %>% unlist()
-  return(Phylogeny)
-}
-
-
 ## Function to attach species that are not in the phylogeny (but that figure in the trait datasets) to their genus, at the root
 
 Attach_Species_Phylo <- function(TraitDF, Phylo, Where) {
@@ -32,21 +24,63 @@ Attach_Species_Phylo <- function(TraitDF, Phylo, Where) {
 
 
 
+## Function to resolve polytomies while adding branch length information to both edges that have 0 BL and their descendants
+## Adapted from: Rangel TF, Colwell RK, Graves GR, Fucíková K, Rahbek C, & Diniz-Filho JAF (2015). Phylogenetic uncertainty revisited: 
+#  Implications for ecological analyses. Evolution 69:1301-1312.
+
+## Adapted to be ran with runs=1 only
+bifurcatr <- function(phy,runs) {
+
+  # trees <- vector("list", length=runs)
+  
+  # for(i in 1:runs) {
+    
+    tree <- phy
+    resolves <- Ntip(tree)-Nnode(tree)-1
+    for(j in 1:resolves) {
+      descendent_counts <- rle(sort(tree$edge[,1]))
+      polytomies <- descendent_counts$values[which(descendent_counts$lengths>2)] # these are parent nodes with more than 2 child nodes
+      if(length(polytomies)>1) target_polytomy <- sample(polytomies,size=1) else target_polytomy <- polytomies
+      polytomy_edges <- which(tree$edge[,1]==target_polytomy)
+      target_edges <- sample(polytomy_edges,size=2)
+      new_node <- max(tree$edge)+1
+      tree$edge[target_edges,1] <- new_node
+      new_edge <- c(target_polytomy,new_node)
+      tree$edge <- rbind(tree$edge,new_edge)
+      new_length <- runif(n=1,min=0,max= min(tree$edge.length[target_edges]))
+      tree$edge.length <- c(tree$edge.length,new_length)
+      tree$edge.length[target_edges] <- tree$edge.length[target_edges] - new_length
+      tree$Nnode <- tree$Nnode+1
+    }
+    # trees[[i]] <- tree
+  # }
+  
+  # if(runs==1) {
+  #   trees <- trees[[1]]
+  #   class(trees) <- "phylo"
+  # }
+  # else {
+  #   class(trees) <- "multiPhylo"
+  # }	
+    
+  return(tree)
+}
+
 
 ## Function to look at how many species have been attached in the phylogeny
 DeltaNspecies <- function(Phylo_Original, Phylo_Added, TraitDF) {
   
-  Diff <- setdiff(TraitDF$Best_guess_binomial, Phylo_Original$tip.label)
+  Diff <- setdiff(TraitDF$Species, Phylo_Original$tip.label)
   
   n_original <- length(unique(Phylo_Original$tip.label))
   n_current <- length(unique(Phylo_Added$tip.label))
   
-  delta_final <- setdiff(TraitDF$Best_guess_binomial, Phylo_Added$tip.label)
+  delta_final <- setdiff(TraitDF$Species, Phylo_Added$tip.label)
 
   # percent species initially not represented in the tree
-  print(paste(length(Diff)/nrow(TraitDF)*100, "% species were initially not represented in tree (", length(Diff), "out of", nrow(TraitDF), ")."))
-  print(paste(n_current-n_original, "species have been added on", length(Diff), "species that were not present in the phylogeny."))
-  print(paste(length(delta_final)/nrow(TraitDF)*100, "% species are finally not represented in tree (", length(delta_final), "out of", nrow(TraitDF), ")."))
+  print(paste(length(Diff)/nrow(TraitDF)*100, "species were initially not represented in tree (", length(Diff), "out of", nrow(TraitDF), ")."))
+  print(paste(n_original-n_current, "species have been added on", length(Diff), "species that were not present in the phylogeny."))
+  print(paste(length(delta_final)/nrow(TraitDF)*100, "species are finally not represented in tree (", length(delta_final), "out of", nrow(TraitDF), ")."))
   
 }
 
@@ -178,30 +212,28 @@ DropTips <- function(PhylogenyCor, PhylogenyUncor) {
 
 ## Functions to extract and add phylogenetic eigenvectors from the phylogenies to the trait dataset as additional predictors
 Extract_eigenvectors <- function(TraitDF, Phylo, N) {
-
+  
   # N <- number of eigenvectors to extract
-
+  
   ## Prune species that do not intersect
   row.names(TraitDF) <- TraitDF$Best_guess_binomial
   Prune_Taxa <- match.phylo.data(Phylo, TraitDF)
   Phylo <- Prune_Taxa$phy
-
+  
   ## Get phylogenetic eigenvectors from the phylogeny and select N first eigenvectors
   print("EIGENVECTOR DECOMPOSITION.")
   EigenV <- PVRdecomp(Phylo)
-
+  
   Eigenvectors <- EigenV@Eigen$vectors
   Eigenvectors <- as.data.frame(Eigenvectors)
   Eigenvectors <- Eigenvectors[, 1:N]
-  for (i in 1:10) {colnames(Eigenvectors)[i] <- paste("EV_",i, sep="")}
+  for (i in 1:10) {colnames(Eigenvectors)[i] <- paste("EV_",i, sep="")} 
   Eigenvectors$Best_guess_binomial <- Prune_Taxa$data$Best_guess_binomial
   Eigenvectors <- Eigenvectors[order(Eigenvectors$Best_guess_binomial), c(11, 1:10)]
-
+  
   return(Eigenvectors)
-
+  
 }
-
-
 
 Add_eigenvectors <- function (TraitDF, EV) {
   
@@ -216,11 +248,3 @@ Add_eigenvectors <- function (TraitDF, EV) {
   return(TraitDF)
   
 }
-
-## Function to get the number of branches of length zero
-
-BL_0_n <- function(Phylogeny){
-  
-  return(length(Phylogeny$edge.length[Phylogeny$edge.length==0]))
-}
-

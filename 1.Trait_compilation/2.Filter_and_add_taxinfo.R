@@ -1,6 +1,7 @@
 ## Add family / order information to compiled trait datasets.
 ## Filter out species that have no information for all traits (these species potentially are replicates); I have verified that none of these appear in PREDICTS.
 ## Filter out species that have no range information, unless they appear in the PREDICTS database?
+## Filter out species that have completeness equal to zero
 
 
 # # PREAMBLE
@@ -8,6 +9,36 @@ X <- c("dplyr", "stringr")
 lapply(X, library, character.only=TRUE); rm(X)
 `%nin%` = Negate(`%in%`)
 
+## Traits
+Traits <- c("Body_mass_g",
+            "Longevity_d",
+            "Litter_size", 
+            "Range_size_m2", 
+            "Habitat_breadth_IUCN",
+            "Specialisation",
+            "Trophic_level",
+            "Diel_activity",
+            "Primary_diet",
+            "Diet_breadth")
+
+TraitsReptiles <- c(Traits[1:8], "Adult_svl_cm", "Maturity_d")
+TraitsAmphibians <- c(Traits[-which(Traits=="Longevity_d")], "Body_length_mm", "Max_longevity_d")
+TraitsMammals <- c(Traits, "Adult_svl_cm", "Generation_length_d")
+TraitsBirds <- c(Traits, "Generation_length_d")
+
+Completeness <- function(TraitDF, Traits) {
+  
+  # completeness
+  TraitDF$Percent <- apply(TraitDF[,Traits], 1, function(y) sum(!is.na(y)))
+  TraitDF$Percent <- TraitDF$Percent / length(Traits) * 100 
+  
+  Completeness_0 <- TraitDF$Best_guess_binomial[TraitDF$Percent==0]
+  print(length(Completeness_0))
+
+  
+  return(Completeness_0)
+  
+}
 
 ## Load data 
 
@@ -207,6 +238,15 @@ Mammals <- Add_family_order_genus(Mammals, Syn_Mammals)
 Amphibians <- Add_family_order_genus(Amphibians, Syn_Amphibians)
 Reptiles <- Add_family_order_genus(Reptiles, Syn_Reptiles)
 Birds <- Add_family_order_genus(Birds, Syn_Birds)
+
+
+## Also remove species for which completeness = 0 for all predictor traits
+## NB none of these species figure in PREDICTS
+Comp.C_Mammals <- Completeness(Mammals, TraitsMammals)
+Comp.C_Reptiles <- Completeness(Reptiles, TraitsReptiles)
+Comp.C_Birds <- Completeness(Birds, TraitsBirds)
+Comp.C_Amphibians <- Completeness(Amphibians, TraitsAmphibians)
+Amphibians <- Amphibians %>% filter(Best_guess_binomial %nin% Comp.C_Amphibians) ## none of these species figure in PREDICTS
 
 
 ## write files

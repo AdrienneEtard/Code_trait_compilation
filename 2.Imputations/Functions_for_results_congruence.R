@@ -163,6 +163,7 @@ Congruence_cat <- function(List_results, Collected, TraitName, AxisX){
   return(p)
 }
 
+
 # Plot for all the categorical traits
 Plot_cat <- function(List_results, Collected, isDiet){
   
@@ -180,6 +181,107 @@ Plot_cat <- function(List_results, Collected, isDiet){
 
 
 
+Summarise_cat_congruence <- function(List_results, Collected, TraitName, Class){
+  
+  DF <- Congruence(List_results, Collected, TraitName)
+  
+  Func <- function(X) {
+    L <- length(unique(as.character(X)))
+    if(L==1) {return("similar")}
+    else{return("contradicting")}
+  }
+  
+  DF$Outcome <- apply(DF[, c(2:9)], 1, Func)
+  
+  Table <- table(DF$Outcome) %>%
+    as.data.frame
+  Table$Agreement <- Table$Freq/(sum(Table$Freq))*100
+  Table <- Table %>%
+    filter(Var1=="similar") %>%
+    select(-Var1, -Freq)
+  Table$Trait <- TraitName
+  Table$Class <- Class
+  
+  return(Table)
+  
+}
+
+GetCatCongruence <- function(List_results, Collected, Traits, Class){
+  
+  Table <- list()
+  
+  for (i in 1:length(Traits)) {
+    Table[[i]] <- Summarise_cat_congruence(List_results, Collected, Traits[i], Class)
+  }
+  
+  Results <- data.table::rbindlist(Table)
+  return(Results)
+}
+
+Plot_Cat_congruence <- function(Table) {
+  
+  GGPoptions <- theme_bw() + theme(
+    panel.border = element_rect(colour = "black", fill=NA),
+    text = element_text(size=13, family="serif"), 
+    axis.text.x = element_text(color="black", margin=ggplot2::margin(10,0,2,0,"pt"), size=12), 
+    axis.text.y = element_text(color="black", margin=ggplot2::margin(0,10,0,0,"pt"), size=12),
+    axis.ticks.length=unit(-0.1, "cm"),
+    legend.text=element_text(size=13))
+  
+  
+  p <- ggplot(Table, aes(Agreement, Trait, col=Class)) + GGPoptions +
+    geom_point() + 
+    #scale_y_continuous(trans="log10", breaks=c(0.01,0.1,1,10,20)) +
+    ylab("") + xlab("% species for which imputations agree \n across 8 imputed datasets") 
+  
+  return(p)
+}
+
+
+Correlation_coeff_imputations <- function(List_results, Collected, Traits, Class) {
+  
+  Table <- list()
+  
+  for(i in 1:length(Traits)) {
+    x <- Congruence(List_results, Collected, TraitName = Traits[i])
+    Cor <- cor(x[, c(2:9)], method = "pearson")
+    Cor[upper.tri(Cor, diag=TRUE)] <- NA
+    X <- mean(Cor, na.rm=TRUE) %>% as.data.frame() %>%
+      setNames(., "Mean_cor")
+    X$min <- min(Cor, na.rm=TRUE)
+    X$max <- max(Cor, na.rm=TRUE)
+    X$Class <- Class
+    X$Trait <- Traits[i]
+    
+    Table[[i]] <- X
+  }
+  
+  Table <- data.table::rbindlist(Table)
+  return(Table)
+}
+
+Plot_Cont_congruence <- function(Table) {
+  
+  GGPoptions <- theme_bw() + theme(
+    panel.border = element_rect(colour = "black", fill=NA),
+    text = element_text(size=13, family="serif"), 
+    axis.text.x = element_text(color="black", margin=ggplot2::margin(10,0,2,0,"pt"), size=12), 
+    axis.text.y = element_text(color="black", margin=ggplot2::margin(0,10,0,0,"pt"), size=12),
+    axis.ticks.length=unit(-0.1, "cm"),
+    legend.text=element_text(size=13))
+  
+  Table <- as.data.frame(Table)
+  
+  
+  p <- ggplot(Table, aes(y=Mean_cor, x=Trait, col=Class)) + GGPoptions +
+    geom_point() + 
+    geom_errorbar(aes(col=Table$Class, ymin=min, ymax=max), width=0, alpha=0.5) +
+    scale_x_discrete(limits=c("Habitat_breadth_IUCN", "Body_mass_g", "Diet_breadth", "Litter_size", "Range_size_m2", "Longevity_d"),
+                       labels=c("HB", "BM", "DB", "LCS", "RS", "L")) +
+    ylab("Mean and range of pairwise correlation \n coefficients across 8 imputed datasets") + xlab("") + coord_flip()
+  
+  return(p)
+}
 
 
 
