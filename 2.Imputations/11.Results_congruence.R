@@ -110,8 +110,8 @@ Cont_traits_congruence[16, c(1:3)] <- NA
 pCont <- Plot_Cont_congruence(Cont_traits_congruence) 
 ggsave(pCont, filename = "../../Results/Plots/Congruence_imputations/Continuous/Summary_plot.pdf", height = 3, width = 5)
 
-p2 <- ggarrange(pCat + labs(tag = "A") + theme(plot.tag.position = "topleft"),
-               pCont+ labs(tag = "B")+ theme(plot.tag.position = "topleft"),
+p2 <- ggarrange(pCont + labs(tag = "A") + theme(plot.tag.position = "topleft"),
+               pCat + labs(tag = "B")+ theme(plot.tag.position = "topleft"),
                common.legend=TRUE, legend = "right")
 ggsave(p2, filename = "../../Results/Plots/Congruence_imputations/Summary.pdf", height = 3, width = 8.5)
 

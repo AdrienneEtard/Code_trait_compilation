@@ -85,7 +85,7 @@ PlotMSE <- function(MSEErrors) {
 
   p <- ggplot(MSE, aes(variable, Mean, col=Class)) + GGPoptions +
     geom_point() + 
-    scale_x_discrete(labels=c("BM (kg)", "LG (years)", "LCS", expression("RS (mega-m"^2*")"), "DB", "HB")) +
+    scale_x_discrete(labels=c("BM (kg)", "L (years)", "LCS", expression("RS (mega-m"^2*")"), "DB", "HB")) +
     scale_y_continuous(labels=c(0.1,1,10,100,1000), breaks=c(0.1,1,10,100,1000), trans="log10") +
     geom_segment(aes(x=variable, xend=variable, y=MSE$Min, yend=MSE$Max, col=Class)) +
     xlab("") + ylab(expression(sqrt("OOB mean-square error"))) + coord_flip()
@@ -134,10 +134,60 @@ pPFC <- PlotPFC(PFC_all)
 ## Plot MSE for all classes
 pMSE <- PlotMSE(MSE_all)
 
-p <- ggarrange(pMSE + labs(tag = "A") + theme(plot.tag.position = c(0.95, 0.94)),
-               pPFC + labs(tag = "B") + theme(plot.tag.position = c(0.95, 0.94)),
+p <- ggarrange(pMSE + labs(tag = "A") + theme(plot.tag.position = "topleft"),
+               pPFC + labs(tag = "B") + theme(plot.tag.position = "topleft"),
                common.legend = TRUE, widths=c(0.555,0.445), legend="right")
 ggsave(p, file="../../Results/Plots/Imputation_errors/MSE_PFC.pdf", width=8.5, height=3)
+
+## Distributions for continuous traits
+GGPoptions <- theme_classic() + theme(
+  panel.border = element_rect(colour = "black", fill=NA),
+  text = element_text(size=13, family="serif"), 
+  axis.text.x = element_text(color="black", margin=ggplot2::margin(10,0,2,0,"pt"), size=12), 
+  axis.text.y = element_text(color="black", margin=ggplot2::margin(0,10,0,0,"pt"), size=12),
+  axis.ticks.length=unit(-0.1, "cm"),
+  legend.text=element_text(size=13))
+
+
+i <- sample(1:8, 1)
+All_traits <- rbind(
+  Get_all_results(Imputed, "A")$Results[[i]],
+  Get_all_results(Imputed, "M")$Results[[i]], 
+  Get_all_results(Imputed, "R")$Results[[i]],
+  Get_all_results(Imputed, "B")$Results[[i]])
+
+All_traits$Class <- factor(All_traits$Class, levels=c("Amphibia", "Aves", "Mammalia", "Reptilia"), labels=c("Amphibians", "Birds","Mammals", "Reptiles"))
+
+DBM <- ggplot(All_traits, aes(Body_mass_g/1000)) +
+  geom_density(aes(fill=Class), adjust=10, alpha=0.3) +
+  scale_x_continuous(trans = "log10", labels=scales::number_format(decimal.mark = '.')) +
+  GGPoptions + xlab(expression("BM (kg)"))
+
+DL <- ggplot(All_traits, aes(Longevity_d/365.25)) +
+  geom_density(aes(fill=Class), adjust=10, alpha=0.3) +
+  scale_x_continuous(trans = "log10", labels=scales::number_format(decimal.mark = '.')) +
+  GGPoptions  + xlab(expression("L (years)"))
+
+DLCS <- ggplot(All_traits, aes(Litter_size)) +
+  geom_density(aes(fill=Class), adjust=10, alpha=0.3) +
+  scale_x_continuous(trans = "log10", labels=scales::number_format(decimal.mark = '.')) +
+  GGPoptions  + xlab(expression("LCS, log"))
+
+DRS <- ggplot(All_traits, aes(Range_size_m2/1000000)) +
+  geom_density(aes(fill=Class), adjust=10, alpha=0.3) +
+  scale_x_continuous(trans = "log10", labels=scales::number_format(decimal.mark = '.')) +
+  GGPoptions  + xlab(expression("RS (km"^2*")"))
+
+
+p <- ggarrange(
+               DBM  + labs(tag = "A") + theme(plot.tag.position = "topleft"),
+               DL + labs(tag = "B") + theme(plot.tag.position = "topleft"),
+               DLCS + labs(tag = "C") + theme(plot.tag.position = "topleft"),
+               DRS  + labs(tag = "D") + theme(plot.tag.position = "topleft"),
+               common.legend = TRUE, legend="right", 
+               ncol=2, nrow=2)
+p
+ggsave(p, file="../../Results/Plots/Imputation_errors/Distributions.pdf", width=8, height=6)
 
 
 

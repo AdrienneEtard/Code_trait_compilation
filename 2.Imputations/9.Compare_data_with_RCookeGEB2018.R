@@ -33,7 +33,7 @@ rm(X,Y)
 # Imputed 
 # select one randomly
 i <- sample(1:8,1)
-AE_Imputed <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_not_standardised/List_of_8_sets.rds")[[i]]
+AE_Imputed <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_corrected_trees/List_of_8_sets.rds")[[i]]
 
 X <- AE_Imputed$M$Imputed.Dataset %>%
   select(Class, Best_guess_binomial, Diel_activity, Body_mass_g, Litter_size, Habitat_breadth_IUCN, Primary_diet,Phylo_info)
@@ -51,11 +51,17 @@ AE_Collected <- AE_Collected %>% Reprocess_diet()
 RC_Imputed$Primary_diet <- as.character(RC_Imputed$Primary_diet)
 AE_Imputed <- AE_Imputed %>% Reprocess_diet()
 
-# log 10 Body mass in kg
+# # # log 10 Body mass in kg
 RC_Collected$log10_Body_mass_kg <- log10(RC_Collected$Body_mass_g / 1000)
 RC_Imputed$log10_Body_mass_kg <- log10(RC_Imputed$Body_mass_g / 1000)
 AE_Collected$log10_Body_mass_kg <-log10(AE_Collected$Body_mass_g / 1000)
 AE_Imputed$log10_Body_mass_kg <- log10(AE_Imputed$Body_mass_g / 1000)
+
+## Body mass in kg
+RC_Collected$Body_mass_kg <- RC_Collected$Body_mass_g / 1000
+RC_Imputed$Body_mass_kg <- RC_Imputed$Body_mass_g / 1000
+AE_Collected$Body_mass_kg <- AE_Collected$Body_mass_g / 1000
+AE_Imputed$Body_mass_kg <- AE_Imputed$Body_mass_g / 1000
 
 
 
@@ -77,7 +83,9 @@ dev.off()
 
 
 ## 1.b. Plot all traits against each other
-p1 <- Plot_all_values(RC_Imputed, AE_Imputed, "log10_Body_mass_kg", FALSE, AxisX = "Body mass (kg, log10, AE)", AxisY = "Body mass (kg, log10, RC)", Diet = FALSE) + 
+#p1 <- Plot_all_values(RC_Imputed, AE_Imputed, "Body_mass_kg", FALSE, AxisX = "Body mass (kg, AE)", AxisY = "Body mass (kg, RC)", Diet = FALSE) + 
+#  labs(tag = "A") + theme(plot.tag.position = c(0.3, 0.92))
+p1 <- Plot_all_values(RC_Imputed, AE_Imputed, "log10_Body_mass_kg", FALSE, AxisX = "Body mass (log10, kg, AE)", AxisY = "Body mass (log10, kg, RC)", Diet = FALSE) + 
   labs(tag = "A") + theme(plot.tag.position = c(0.3, 0.92))
 p2 <- Plot_all_values(RC_Imputed, AE_Imputed, "Litter_size", FALSE, AxisX = "Litter size (AE)", AxisY = "Litter size (RC)", Diet = FALSE)+ 
   labs(tag = "B") + theme(plot.tag.position = c(0.3, 0.92))
