@@ -337,8 +337,8 @@ WMammals <- Wilcox_Test(SimMammals_c, DeltaMammals_c); WMammals$Class <- "Mammal
 WAmphibians <- Wilcox_Test(SimAmphibians_c, DeltaAmphibians_c); WAmphibians$Class <- "Amphibians"
 
 WTests <- rbind(WBirds, WReptiles, WMammals, WAmphibians)
-min(WTests$W_pvalue)
-write.csv(WTests,"../../Results/1.Traits_before_imputations/Phylogenetic_signal/Categorical_traits_significance_Wilcoxon_corrected.csv", row.names = FALSE)
+max(WTests$W_pvalue)
+write.csv(WTests,"../../Results/1.Traits_before_imputations/Phylogenetic_signal/Categorical_traits_significance_Wilcoxon_corrected.csv", row.names = TRUE)
 
 # uncorrected phylogenies
 WBirds <- Wilcox_Test(SimBirds_o, DeltaBirds_o); WBirds$Class <- "Birds"
@@ -347,7 +347,7 @@ WMammals <- Wilcox_Test(SimMammals_o, DeltaMammals_o); WMammals$Class <- "Mammal
 WAmphibians <- Wilcox_Test(SimAmphibians_o, DeltaAmphibians_o); WAmphibians$Class <- "Amphibians"
 
 WTestsO <- rbind(WBirds, WReptiles, WMammals, WAmphibians)
-min(WTestsO$W_pvalue)
-write.csv(WTestsO,"../../Results/1.Traits_before_imputations/Phylogenetic_signal/Categorical_traits_significance_Wilcoxon_original.csv", row.names = FALSE)
+max(WTestsO$W_pvalue)
+write.csv(WTestsO,"../../Results/1.Traits_before_imputations/Phylogenetic_signal/Categorical_traits_significance_Wilcoxon_original.csv", row.names = TRUE)
 
 

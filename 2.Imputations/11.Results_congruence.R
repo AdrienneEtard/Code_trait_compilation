@@ -115,3 +115,6 @@ p2 <- ggarrange(pCont + labs(tag = "A") + theme(plot.tag.position = "topleft"),
                common.legend=TRUE, legend = "right")
 ggsave(p2, filename = "../../Results/Plots/Congruence_imputations/Summary.pdf", height = 3, width = 8.5)
 
+
+pCont$data
+pCat$data[pCat$data$Class=="Mammals",]

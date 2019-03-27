@@ -7,6 +7,14 @@ library(ggpubr)
 library(reshape)
 source("Functions_for_results_congruence.R")
 
+GGPoptions <- theme_classic() + theme(
+  panel.border = element_rect(colour = "black", fill=NA),
+  text = element_text(size=13, family="serif"), 
+  axis.text.x = element_text(color="black", margin=ggplot2::margin(10,0,2,0,"pt"), size=12), 
+  axis.text.y = element_text(color="black", margin=ggplot2::margin(0,10,0,0,"pt"), size=12),
+  axis.ticks.length=unit(-0.1, "cm"),
+  legend.text=element_text(size=13))
+
 Cattraits <- c("Trophic_level", "Diel_activity", "Specialisation", "Primary_diet")
 
 ## Functions to get and to plot imputation errors for categorical imputed traits: PFC
@@ -95,7 +103,15 @@ PlotMSE <- function(MSEErrors) {
 
 
 ## Load imputed datasets (8); retrieve errors
+
+# imputed with corrected phylogenies
 Imputed <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_corrected_trees/List_of_8_sets.rds")
+
+# imputed with original trees
+Imputed_o <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_original_trees/List_of_8_sets.rds")
+
+
+## With corrected phylogenies
 
 ## Amphibians
 Amphibians <- Get_all_results(Imputed, "A")$Errors
@@ -139,16 +155,99 @@ p <- ggarrange(pMSE + labs(tag = "A") + theme(plot.tag.position = "topleft"),
                common.legend = TRUE, widths=c(0.555,0.445), legend="right")
 ggsave(p, file="../../Results/Plots/Imputation_errors/MSE_PFC.pdf", width=8.5, height=3)
 
+
+# ## Amphibians_o
+# Amphibians_o <- Get_all_results(Imputed_o, "A")$Errors
+# Errors_amp_o <- data.table::rbindlist(Amphibians_o)%>% as.data.frame()
+# 
+# ## Reptiles
+# Reptiles_o <- Get_all_results(Imputed_o, "R")$Errors
+# Errors_rep_o <- data.table::rbindlist(Reptiles_o)%>% as.data.frame()
+# 
+# ## Mammals
+# Mammals_o <- Get_all_results(Imputed_o, "M")$Errors
+# Errors_mam_o <- data.table::rbindlist(Mammals_o)%>% as.data.frame()
+# 
+# ## Birds
+# Birds_o <- Get_all_results(Imputed_o, "B")$Errors
+# Errors_bir_o <- data.table::rbindlist(Birds_o)%>% as.data.frame()
+# 
+# 
+# ## PFC for all classes
+# PFC_amp_o <- GetPFC(Errors_amp_o); PFC_amp_o$Class <- "Amphibians"
+# PFC_rep_o <- GetPFC(Errors_rep_o); PFC_rep_o$`Primary_diet PFC` <- NA;  PFC_rep_o$Class <- "Reptiles"
+# PFC_mam_o <- GetPFC(Errors_mam_o); PFC_mam_o$Class <- "Mammals"
+# PFC_bir_o <- GetPFC(Errors_bir_o); PFC_bir_o$Class <- "Birds"
+# PFC_all_o <- rbind(PFC_amp_o, PFC_rep_o, PFC_mam_o, PFC_bir_o)
+# 
+# ## MSE for all classes
+# MSE_amp_o <- GetrootMSE(Errors_amp_o); MSE_amp_o$Class <- "Amphibians"
+# MSE_rep_o <- GetrootMSE(Errors_rep_o);  MSE_rep_o$`Diet_breadth MSE` <- NA;  MSE_rep_o$Class <- "Reptiles"
+# MSE_mam_o <- GetrootMSE(Errors_mam_o);  MSE_mam_o$Class <- "Mammals"
+# MSE_bir_o <- GetrootMSE(Errors_bir_o); MSE_bir_o$Class <- "Birds"
+# MSE_all_o <- rbind(MSE_amp_o, MSE_rep_o, MSE_mam_o, MSE_bir_o)
+# 
+# 
+# ## Plot PFC for all classes
+# pPFC_o <- PlotPFC(PFC_all_o)
+# ## Plot MSE for all classes
+# pMSE_o <- PlotMSE(MSE_all_o)
+# 
+# 
+# ## Comparison of errors between imputations with original VS modified phylogenies
+# 
+# ## Delta PFC
+# PFC_m <- pPFC$data %>%
+#   mutate(Phylogeny="Modified")
+# PFC_o <- pPFC_o$data %>%
+#   mutate(Phylogeny="Original")
+# 
+# PFC_comparison <- rbind(PFC_m, PFC_o) %>%
+#   as.data.frame()
+# 
+# Delta_PFC <- cbind(PFC_m, PFC_o) %>%
+#   as.data.frame()
+# 
+# Delta_PFC$Delta_Mean_error <- Delta_PFC$Mean1 - Delta_PFC$Mean
+# Delta_PFC$Delta_Max_error <- Delta_PFC$Max1 - Delta_PFC$Max
+# Delta_PFC$Delta_Min_error <- Delta_PFC$Min1 - Delta_PFC$Min
+# 
+# Delta_PFC <- Delta_PFC %>% select(Class, variable, Delta_Mean_error, Delta_Max_error, Delta_Min_error)
+# 
+# ggplot(Delta_PFC, aes(variable, Delta_Mean_error, col=Class)) + GGPoptions +
+#   geom_hline(yintercept=0, linetype="dashed") +
+#   geom_point() + 
+#   scale_x_discrete(labels=c("DA", "TL", "PD", "Sp")) +
+#   geom_segment(aes(x=variable, xend=variable, y=Delta_PFC$Delta_Min_error, yend=Delta_PFC$Delta_Max_error, col=Class)) +
+#   xlab("") + ylab("Delta OOB % falsely classified") + coord_flip() 
+# 
+# ## Delta MSE
+# MSE_m <- pMSE$data %>%
+#   mutate(Phylogeny="Modified")
+# MSE_o <- pMSE_o$data %>%
+#   mutate(Phylogeny="Original")
+# 
+# MSE_comparison <- rbind(MSE_m, MSE_o) %>%
+#   as.data.frame()
+# 
+# Delta_MSE <- rbind(MSE_m, MSE_o) %>%
+#   as.data.frame()
+# 
+# # Delta_MSE$Delta_Mean_error <- Delta_MSE$Mean1 - Delta_MSE$Mean
+# # Delta_MSE$Delta_Max_error <- Delta_MSE$Max1 - Delta_MSE$Max
+# # Delta_MSE$Delta_Min_error <- Delta_MSE$Min1 - Delta_MSE$Min
+# # 
+# # Delta_MSE <- Delta_MSE %>% select(Class, variable, Delta_Mean_error, Delta_Max_error, Delta_Min_error)
+# 
+# ggplot(Delta_MSE, aes(variable, Mean, col=Class, group=Phylogeny, shape=Phylogeny)) + GGPoptions +
+#   geom_point(position = position_dodge(width=0.3)) + 
+#   scale_y_continuous(trans = "log10") +
+#   #geom_segment(aes(x=variable, xend=variable, y=Delta_MSE$Min, yend=Delta_MSE$Max, col=Class, group=Phylogeny), position = position_dodge(width=0.3)) +
+#   xlab("") + ylab("Delta OOB root-MSE") + coord_flip() 
+
+
+
 ## Distributions for continuous traits
-GGPoptions <- theme_classic() + theme(
-  panel.border = element_rect(colour = "black", fill=NA),
-  text = element_text(size=13, family="serif"), 
-  axis.text.x = element_text(color="black", margin=ggplot2::margin(10,0,2,0,"pt"), size=12), 
-  axis.text.y = element_text(color="black", margin=ggplot2::margin(0,10,0,0,"pt"), size=12),
-  axis.ticks.length=unit(-0.1, "cm"),
-  legend.text=element_text(size=13))
-
-
 i <- sample(1:8, 1)
 All_traits <- rbind(
   Get_all_results(Imputed, "A")$Results[[i]],
@@ -171,7 +270,7 @@ DL <- ggplot(All_traits, aes(Longevity_d/365.25)) +
 DLCS <- ggplot(All_traits, aes(Litter_size)) +
   geom_density(aes(fill=Class), adjust=10, alpha=0.3) +
   scale_x_continuous(trans = "log10", labels=scales::number_format(decimal.mark = '.')) +
-  GGPoptions  + xlab(expression("LCS, log"))
+  GGPoptions  + xlab(expression("LCS"))
 
 DRS <- ggplot(All_traits, aes(Range_size_m2/1000000)) +
   geom_density(aes(fill=Class), adjust=10, alpha=0.3) +
@@ -188,6 +287,4 @@ p <- ggarrange(
                ncol=2, nrow=2)
 p
 ggsave(p, file="../../Results/Plots/Imputation_errors/Distributions.pdf", width=8, height=6)
-
-
 
