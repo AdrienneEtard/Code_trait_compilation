@@ -149,15 +149,15 @@ Amphibians_o <- readRDS("../../Results/1.Traits_before_imputations/Phylogenetic_
 
 
 ## Continuous traits (for plotting)
-Lambda_M_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousMammals.csv")
-Lambda_B_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousBirds.csv")
-Lambda_R_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousReptiles.csv")
-Lambda_A_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousAmphibians.csv")
+Lambda_M_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousMammals_log.csv")
+Lambda_B_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousBirds_log.csv")
+Lambda_R_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousReptiles_log.csv")
+Lambda_A_c <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousAmphibians_log.csv")
 
-Lambda_M_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousMammals.csv")
-Lambda_B_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousBirds.csv")
-Lambda_R_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousReptiles.csv")
-Lambda_A_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousAmphibians.csv")
+Lambda_M_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousMammals_log10.csv")
+Lambda_B_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousBirds_log10.csv")
+Lambda_R_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousReptiles_log10.csv")
+Lambda_A_o <- read.csv("../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_original_phylogenies/ContinuousAmphibians_log10.csv")
 
 
 

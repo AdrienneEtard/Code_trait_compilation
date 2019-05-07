@@ -19,7 +19,6 @@ Compare <- function(RC_data, RC_imputed, AE_data, AE_imputed, Imputed,
                     Traitaxis, ImputedaxisX, ImputedaxisY,
                     Comparison, CompRC_collected, Diet) {
   
-  
   if(Imputed) {
     
     

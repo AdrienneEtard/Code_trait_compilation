@@ -41,7 +41,7 @@ Data$N_target <- as.factor(Data$N_target)
 p1 <- ggplot(Data, aes(x=N_predictors,y=log_RS, fill=Class)) + 
   geom_boxplot(outlier.size =0.5, outlier.colour = "lightblue") +
   facet_wrap(~Class) + coord_flip() + GGPoptions +
-  xlab(expression("Range size (log m"^2*")")) + ylab("Number of sampled traits")
+  ylab(expression("Range size (log m"^2*")")) + xlab("Number of sampled traits")
   
 
 # ## Poisson models for each class
@@ -57,17 +57,21 @@ p2 <- ggplot(Data, aes(x = log_RS, y = Model_pred, group=Class, col=Class)) +
   geom_line(size = 1) + GGPoptions + xlab(expression("Range size (log m"^2*")")) + ylab("Predicted numbers of known traits")
 
 # Test for goodness of fit: should not be sgnificant if the model fits the data well
+# estimate of overdispersion residual deviance/residual df (oversdispersion if this is significantly greater than 1)
+model$deviance / model$df.residual
 with(model, cbind(res.deviance = deviance, df = df.residual,
                p = pchisq(deviance, df.residual, lower.tail=FALSE)))
 
 # # Test for effect of class
 # ## update model for a  model dropping class
 # m0 <- update(model, . ~ . - Class)
+m0 <- glm(as.numeric(N_predictors) ~ log_RS, family="poisson", data=Data)
 # ## test model differences with chi square test
-# anova(m0, model, test="Chisq")
+anova(m0, model, test="Chisq")
 
 p <- ggarrange(p1+ theme(legend.title = element_blank()),p2, widths = c(0.5,0.5), labels = c("A", "B"), common.legend = TRUE, legend = "right")
 ggsave(p, filename="../../Results/Plots/Trait_missing_values/Poisson_model_predictions.pdf", width=10, height=5)
 
+plot(model)
 
 

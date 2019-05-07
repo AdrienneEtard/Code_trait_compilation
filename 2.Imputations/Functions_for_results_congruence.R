@@ -171,7 +171,7 @@ Plot_cat <- function(List_results, Collected, isDiet){
   SP <- Congruence_cat(List_results, Collected, "Specialisation", AxisX = "Sp")
   TL <- Congruence_cat(List_results, Collected, "Trophic_level", AxisX = "TL")
   if(isDiet){  
-    PD <- Congruence_cat(List_results, Collected, "Primary_diet", AxisX = "DA")
+    PD <- Congruence_cat(List_results, Collected, "Primary_diet", AxisX = "PD")
     return(list(pDA=DA, pSP=SP, pTL=TL, pPD=PD))
   }
   else{return(list(pDA=DA, pSP=SP, pTL=TL))}

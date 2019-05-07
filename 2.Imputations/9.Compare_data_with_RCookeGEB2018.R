@@ -140,7 +140,8 @@ p1 <- Compare(RC_Collected %>% mutate(Body_mass_g=Body_mass_g/1000), RC_Imputed 
 #   labs(tag = "E") + theme(plot.tag.position = c(0.20, 0.94))
 
 p2 <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed,  FALSE, "Litter_size", FALSE, "LCS ", "imputed", "imputed", TRUE, TRUE, FALSE) +
-  labs(tag = "C") + theme(plot.tag.position = c(0.20, 0.94))
+  labs(tag = "C") + theme(plot.tag.position = c(0.20, 0.94))  + 
+  scale_color_manual(name="Class", labels = c("Mammals"), values = c("#dc322f")) 
 p2b <- Compare(RC_Collected, RC_Imputed, AE_Collected, AE_Imputed, FALSE, "Litter_size", FALSE, "LCS ", "imputed", "imputed", TRUE, FALSE, FALSE)+
   labs(tag = "D") + theme(plot.tag.position = c(0.20, 0.94))
 

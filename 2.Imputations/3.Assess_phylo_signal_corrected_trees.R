@@ -104,6 +104,7 @@ Birds <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_corr
 Amphibians <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
 Reptiles <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 
+
 # Load phylogenies
 Phylo_Mammals <- read.newick("../../Results/1.Phylogenies/Corrected/2.Dropped_tips/Mammals.nwk") %>% .Format_tiplabels() 
 Phylo_Amphibians <- read.newick("../../Results/1.Phylogenies/Corrected/2.Dropped_tips/Amphibians.nwk") %>% .Format_tiplabels()
@@ -128,6 +129,19 @@ Categorical.Traits <- c("Specialisation",
                         "Trophic_level",
                         "Diel_activity",
                         "Primary_diet")
+
+
+# log-transform continuous traits
+Transf <- function(Data, Traits_log10) {
+  Data[, Traits_log10] <- log10(Data[, Traits_log10])
+  Data$Habitat_breadth_IUCN <- sqrt(Data$Habitat_breadth_IUCN)
+  return(Data)
+}
+
+Mammals <- Transf(Mammals, Traits_log10=c(Continuous.Traits[-which(Continuous.Traits=="Habitat_breadth_IUCN")],"Generation_length_d", "Adult_svl_cm"))
+Birds <- Transf(Birds, Traits_log10=c(Continuous.Traits[-which(Continuous.Traits=="Habitat_breadth_IUCN")],"Generation_length_d"))
+Amphibians <- Transf(Amphibians, Traits_log10=c(Continuous.Traits[-which(Continuous.Traits=="Habitat_breadth_IUCN")],"Body_length_mm"))
+Reptiles <- Transf(Reptiles, Traits_log10=c("Body_mass_g","Longevity_d","Litter_size","Adult_svl_cm", "Range_size_m2","Maturity_d"))
 
 # Names
 Names.Mammals <- Mammals$Best_guess_binomial
@@ -155,7 +169,7 @@ Lambda_Mammals_continuous <- parApply(Cluster, Mammals[, c(Continuous.Traits,"Ge
 end_time <- Sys.time()
 timeMcont <- end_time-start_time
 print(timeMcont)
-write.csv(Lambda_Mammals_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousMammals.csv",row.names = FALSE)
+write.csv(Lambda_Mammals_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousMammals_log.csv",row.names = FALSE)
 
 print(Sys.time())
 start_time <- Sys.time()
@@ -163,7 +177,7 @@ Lambda_Amphibians_continuous <- parApply(Cluster, Amphibians[, c(Continuous.Trai
 end_time <- Sys.time()
 timeAcont <- end_time-start_time
 print(timeAcont)
-write.csv(Lambda_Amphibians_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousAmphibians.csv",row.names = FALSE)
+write.csv(Lambda_Amphibians_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousAmphibians_log.csv",row.names = FALSE)
 
 print(Sys.time())
 RC <- Continuous.Traits[-which(Continuous.Traits=="Diet_breadth")]
@@ -172,7 +186,7 @@ Lambda_Reptiles_continuous <- parApply(Cluster, Reptiles[, c(RC, "Adult_svl_cm",
 end_time <- Sys.time()
 timeRcont <- end_time-start_time
 print(timeRcont)
-write.csv(Lambda_Reptiles_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousReptiles.csv",row.names = FALSE)
+write.csv(Lambda_Reptiles_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousReptiles_log.csv",row.names = FALSE)
 
 print(Sys.time())
 start_time <- Sys.time()
@@ -180,45 +194,45 @@ Lambda_Birds_continuous <- parApply(Cluster, Birds[, c(Continuous.Traits, "Gener
 end_time <- Sys.time()
 timeBcont <- end_time-start_time
 print(timeBcont)
-write.csv(Lambda_Birds_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousBirds.csv",row.names = FALSE)
+write.csv(Lambda_Birds_continuous, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/ContinuousBirds_log.csv",row.names = FALSE)
 
 
-## 2. Phylogenetic signal in categorical traits
-
-print("starting estimations on categorical traits")
-
-print(Sys.time())
-start_time <- Sys.time()
-delta_Mammals_categorical <- parApply(Cluster, Mammals[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Mammals, Phylo=Phylo_Mammals, n=50)
-end_time <- Sys.time()
-timeMcat <- end_time-start_time 
-print(timeMcat)
-saveRDS(delta_Mammals_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalMammals.rds")
-
-print(Sys.time())
-start_time <- Sys.time()
-delta_Birds_categorical <- parApply(Cluster, Birds[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Birds, Phylo=Phylo_Birds, n=50)
-end_time <- Sys.time()
-timeBcat <- end_time-start_time
-print(timeBcat)
-saveRDS(delta_Birds_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalBirds.rds")
-
-print(Sys.time())
-start_time <- Sys.time()
-delta_Reptiles_categorical <- parApply(Cluster, Reptiles[, Categorical.Traits[-which(Categorical.Traits=="Primary_diet")]], 2, PhySignal_Cat, Names=Names.Reptiles, Phylo=Phylo_Reptiles, n=50)
-end_time <- Sys.time()
-timeRcat <- end_time-start_time
-print(timeRcat)
-saveRDS(delta_Reptiles_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalReptiles.rds")
-
-print(Sys.time())
-start_time <- Sys.time()
-delta_Amphibians_categorical <- parApply(Cluster, Amphibians[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Amphibians, Phylo=Phylo_Amphibians, n=50)
-end_time <- Sys.time()
-timeAcat <- end_time-start_time
-print(timeAcat)
-saveRDS(delta_Amphibians_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalAmphibians.rds")
-
+# ## 2. Phylogenetic signal in categorical traits
+# 
+# print("starting estimations on categorical traits")
+# 
+# print(Sys.time())
+# start_time <- Sys.time()
+# delta_Mammals_categorical <- parApply(Cluster, Mammals[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Mammals, Phylo=Phylo_Mammals, n=50)
+# end_time <- Sys.time()
+# timeMcat <- end_time-start_time 
+# print(timeMcat)
+# saveRDS(delta_Mammals_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalMammals.rds")
+# 
+# print(Sys.time())
+# start_time <- Sys.time()
+# delta_Birds_categorical <- parApply(Cluster, Birds[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Birds, Phylo=Phylo_Birds, n=50)
+# end_time <- Sys.time()
+# timeBcat <- end_time-start_time
+# print(timeBcat)
+# saveRDS(delta_Birds_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalBirds.rds")
+# 
+# print(Sys.time())
+# start_time <- Sys.time()
+# delta_Reptiles_categorical <- parApply(Cluster, Reptiles[, Categorical.Traits[-which(Categorical.Traits=="Primary_diet")]], 2, PhySignal_Cat, Names=Names.Reptiles, Phylo=Phylo_Reptiles, n=50)
+# end_time <- Sys.time()
+# timeRcat <- end_time-start_time
+# print(timeRcat)
+# saveRDS(delta_Reptiles_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalReptiles.rds")
+# 
+# print(Sys.time())
+# start_time <- Sys.time()
+# delta_Amphibians_categorical <- parApply(Cluster, Amphibians[, Categorical.Traits], 2, PhySignal_Cat, Names=Names.Amphibians, Phylo=Phylo_Amphibians, n=50)
+# end_time <- Sys.time()
+# timeAcat <- end_time-start_time
+# print(timeAcat)
+# saveRDS(delta_Amphibians_categorical, "../../Results/1.Traits_before_imputations/Phylogenetic_signal/with_corrected_phylogenies/CategoricalAmphibians.rds")
+# 
 
 ## DESTROY CLUSTER
 stopCluster(Cluster)
