@@ -121,7 +121,7 @@ For.Amphibio <- function(AmphiData) {
 }
 
 
-## 2. Kissling (MammalDIET): 1 are primary food items
+## 2. Kissling (MammalDIET): 1 are primary food items, 0 are items that score less than 50%
 
 For.MammalDiet <- function(MammalDiet) {
   
@@ -160,7 +160,7 @@ For.MammalDiet <- function(MammalDiet) {
 
 ## 3. Elton birds and mammals
 
-# For Elton mammals, need to define the primary diet based on food itens that score more than 50 percent
+# For Elton mammals, need to define the primary diet based on food items that score more than 50 percent
 # Primary diet is already present in Elton birds
 
 Elton.Mammals <- function(Elton) {
@@ -171,16 +171,19 @@ Elton.Mammals <- function(Elton) {
   # Primary diet based on predominant food items (here, cases where all < 50 or one >50)
   Elton <- Elton %>% 
     mutate(Diet.5Cat=ifelse((Diet.Fruit<50 & Diet.Inv<50 & Diet.Nect<50 & Diet.Seed<50 & Diet.PlantO<50 & Diet.Vert <50), "OM",  # cases where all below 50
-                                ifelse(Diet.Fruit>50 | Diet.Nect>50, "FR|NE",
+                            # cases where one food item is strictly above 50 percent    
+                            ifelse(Diet.Fruit>50 | Diet.Nect>50, "FR|NE",
                                              ifelse(Diet.PlantO>50 | Diet.Seed>50, "PL|SE",
                                                     ifelse(Diet.Vert>50, "VE",
-                                                           ifelse(Diet.Inv>50, "IN", # cases where one above 50 and then cases where one equals 50
+                                                           ifelse(Diet.Inv>50, "IN", 
+                                                                  # cases where one above 50 
                                                                   ifelse(Diet.Fruit==50 & Diet.Nect<50 & Diet.Inv <50 & Diet.PlantO <50 & Diet.Seed<50 & Diet.Vert<50, "FR|NE", 
                                                                          ifelse(Diet.Fruit<50 & Diet.Nect==50 & Diet.Inv <50 & Diet.PlantO <50 & Diet.Seed<50 & Diet.Vert<50, "FR|NE",
                                                                                 ifelse(Diet.Fruit<50 & Diet.Nect<50 & Diet.Inv==50 & Diet.PlantO <50 & Diet.Seed<50 & Diet.Vert<50, "IN",
                                                                                        ifelse(Diet.Fruit<50 & Diet.Nect<50 & Diet.Inv <50 & Diet.PlantO==50 & Diet.Seed<50 & Diet.Vert<50, "PL|SE",
                                                                                               ifelse(Diet.Fruit<50 & Diet.Nect<50 & Diet.Inv <50 & Diet.PlantO <50 & Diet.Seed==50 & Diet.Vert<50, "PL|SE",
                                                                                                      ifelse(Diet.Fruit<50 & Diet.Nect<50 & Diet.Inv <50 & Diet.PlantO <50 & Diet.Seed<50 & Diet.Vert==50, "VE",
+                                                                                                            #cases where two food items have equal percent use
                                                                                                             ifelse(Diet.Fruit==50 & Diet.Nect==50, "FR|NE", 
                                                                                                                    ifelse(Diet.PlantO==50 & Diet.Seed==50, "PL|SE", "OM"))))))))))))))
   return(Elton)
