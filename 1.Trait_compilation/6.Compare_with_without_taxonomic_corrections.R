@@ -1,13 +1,13 @@
 ## Comparison of basic trait coverage with VS without taxonomic correction
 ## and of number of species for which traits were compiled
 
-
 # # #   P  R  E  A  M  B  L  E
 
 X <- c("dplyr", "ggplot2", "ggpubr", "grid", "cowplot", "phytools", "picante")
 lapply(X, library, character.only=TRUE); rm(X)
 source("Comparison_with_without_taxonomic_corrections_functions.R")
 source("Functions_for_phylogenies.R")
+`%nin%` <- Negate(`%in%`)
 
 ## Load trait files
 
@@ -56,6 +56,16 @@ C_Mammals_NoAdd <- EV_corrected(C_Mammals, Phylo_Mammals)
 C_Reptiles_NoAdd <- EV_corrected(C_Reptiles, Phylo_Reptiles)
 C_Birds_NoAdd <- EV_corrected(C_Birds, Phylo_Birds)
 
+## filter non terrestrial mammals
+
+C_Mammals <- C_Mammals %>%
+  filter(Order %nin% c("SIRENIA")) %>%
+  filter(Family %nin% c("OTARIIDAE", "PHOCIDAE", "ODOBENIDAE", 
+                        "BALAENIDAE", "BALAENOPTERIDAE", "ZIPHIIDAE", 
+                        "NEOBALAENIDAE", "DELPHINIDAE", "MONODONTIDAE",
+                        "ESCHRICHTIIDAE", "INIIDAE", "PHYSETERIDAE","LIPOTIDAE",
+                        "PHOCOENIDAE", "PLATANISTIDAE", "PONTOPORIIDAE"))
+
 
 ## 1. Differences in species number
 
@@ -87,6 +97,7 @@ CovPhyloPredicts <- Phylo_Delta(C_Mammals_NoAdd, C_Birds_NoAdd, C_Reptiles_NoAdd
 
 p <- PlotPhyloCov(CovPhyloAll,CovPhyloPredicts, 15)
 ggsave(p, file="../../Results/Plots/Coverage/Phylogenies/Species_representation.pdf", width=8, height=4.2)
+ggsave(p, file="../../Results/Plots_CBER_talk_20119/phylo_species_representation.png", width=8, height=4.2, dpi=1000)
 
 
 # 2.2. % Trait coverage
@@ -234,5 +245,24 @@ legend(x=-110, y=-6, title="Trait coverage",
        fill = c("#F8766D", "#00BFC4"),  bty="n")
 dev.off()
 
+
+
+
+# png(file="../../Results/Plots_CBER_talk_20119/Coverage.png", width =7, height=6, units="in", res=600)
+# par(tcl=0.2, cex.lab=1, mgp=c(1.5,0.2,0), mar = c(3,7,2,2), oma=c(5,2,1,1))
+# par(mfrow=c(2,2))
+# Plot.Delta.Cov(UN_Mammals, C_Mammals, TMammalsI, FALSE, UN_Predicts, C_Predicts, "Mammals")
+# Plot.Delta.Cov(UN_Birds, C_Birds, TBirdsI, FALSE, UN_Predicts, C_Predicts, "Birds")
+# Plot.Delta.Cov(UN_Reptiles, C_Reptiles, TReptilesI, FALSE, UN_Predicts, C_Predicts, "Reptiles")
+# Plot.Delta.Cov(UN_Amphibians, C_Amphibians, TAmphibiansI, FALSE, UN_Predicts, C_Predicts, "Amphibians")
+# 
+# mtext(at=50, line=-12.5, "% coverage", cex=0.8)
+# mtext(at=-140, line=-12.5, "% coverage", cex=0.8)
+# 
+# par(xpd=NA)
+# legend(x=-110, y=-6, title="Trait coverage",
+#        legend = c("Without taxonomic correction", "With taxonomic correction"),
+#        fill = c("#F8766D", "#00BFC4"), bty="n")
+# dev.off()
 
 

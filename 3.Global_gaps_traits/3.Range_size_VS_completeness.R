@@ -2,7 +2,6 @@
 library(dplyr)
 library(ggplot2)
 library(ggpubr)
-setwd("../../1.Trait_compilation/Code/3.Global_gaps_traits/")
 
 GGPoptions <- theme_classic()+ theme(
   panel.border = element_rect(colour = "black", fill=NA),

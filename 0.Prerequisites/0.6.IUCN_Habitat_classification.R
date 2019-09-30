@@ -11,6 +11,16 @@ IUCN_amphibian_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolv
 IUCN_bird_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_birds.csv")
 IUCN_reptile_C <- read.csv("../../../1.Trait_compilation/Results/0.Data_resolved_taxonomy/Processed_datasets/Traits/IUCN_habitat_reptiles.csv")
 
+# all <- rbind(IUCN_amphibian_C, IUCN_bird_C, IUCN_mammal_C, IUCN_reptile_C)
+# 
+# all$Major.importance <- as.character(all$Major.importance)
+# all$Major.importance[is.na(all$Major.importance)] <- "Unknown"
+# 
+# all$Suitability <- as.character(all$Suitability)
+# all$Suitability[is.na(all$Suitability)] <- "Unknown"
+# 
+# table( all$Suitability, all$Major.importance)
+
 IUCN_amphibian_C$Best_guess_binomial %<>% as.character()
 IUCN_mammal_C$Best_guess_binomial %<>% as.character()
 IUCN_bird_C$Best_guess_binomial %<>% as.character()
@@ -92,11 +102,22 @@ IUCN_Habitat_calc <- function(IUCN_Habitat, With_weights) {
     as.data.frame() %>%
     setNames(., c("Suitability", "Major.importance", "N"))
   
+  # if(With_weights){
+  #     tbl <- tbl %>% 
+  #   mutate(Weight=ifelse((Suitability=="Suitable"| Suitability=="Unknown") & (Major.importance=="Yes"|Major.importance=="Unknown"), 1, 
+  #                        ifelse(Suitability=="Suitable" & Major.importance=="No", 0.5, 0.3))) %>%
+  #   mutate(Score=N*Weight)
+  # }
+  
   if(With_weights){
-      tbl <- tbl %>% 
-    mutate(Weight=ifelse((Suitability=="Suitable"| Suitability=="Unknown") & (Major.importance=="Yes"|Major.importance=="Unknown"), 1, 
-                         ifelse(Suitability=="Suitable" & Major.importance=="No", 0.5, 0.3))) %>%
-    mutate(Score=N*Weight)
+
+    tbl <- tbl %>% 
+      mutate(Weight=ifelse((Suitability=="Suitable") & (Major.importance=="Yes"), 1, 
+                           ifelse(Suitability=="Suitable" & (Major.importance=="No"|Major.importance=="Unknown"), 0.5,
+                                  ifelse(Suitability=="Unknown" & Major.importance=="Unknown", 0.5, 0.3)))) %>%
+      mutate(Score=N*Weight)
+    
+
   }
   
   if(!With_weights) {
@@ -201,20 +222,20 @@ Habitat_reptile_nw <- IUCN_Habitat_calc(IUCN_reptile_C, FALSE)
 
 
 ## Save files
-write.csv(Habitat_amphibian_C, "../../Results/0.Processed_IUCN_Habitatdata/Amphibians.csv", row.names = FALSE)
-write.csv(Habitat_bird_C, "../../Results/0.Processed_IUCN_Habitatdata/Birds.csv", row.names = FALSE)
-write.csv(Habitat_reptile_C, "../../Results/0.Processed_IUCN_Habitatdata/Reptiles.csv", row.names = FALSE)
-write.csv(Habitat_mammal_C, "../../Results/0.Processed_IUCN_Habitatdata/Mammals.csv", row.names = FALSE)
+write.csv(Habitat_amphibian_C, "../../Results/0.Processed_IUCN_Habitatdata/Amphibians_v2.csv", row.names = FALSE)
+write.csv(Habitat_bird_C, "../../Results/0.Processed_IUCN_Habitatdata/Birds_v2.csv", row.names = FALSE)
+write.csv(Habitat_reptile_C, "../../Results/0.Processed_IUCN_Habitatdata/Reptiles_v2.csv", row.names = FALSE)
+write.csv(Habitat_mammal_C, "../../Results/0.Processed_IUCN_Habitatdata/Mammals_v2.csv", row.names = FALSE)
 
 write.csv(Habitat_amphibian_nw, "../../Results/0.Processed_IUCN_Habitatdata/Amphibians_UNWEIGHTED.csv", row.names = FALSE)
 write.csv(Habitat_bird_nw, "../../Results/0.Processed_IUCN_Habitatdata/Birds_UNWEIGHTED.csv", row.names = FALSE)
 write.csv(Habitat_reptile_nw, "../../Results/0.Processed_IUCN_Habitatdata/Reptiles_UNWEIGHTED.csv", row.names = FALSE)
 write.csv(Habitat_mammal_nw, "../../Results/0.Processed_IUCN_Habitatdata/Mammals_UNWEIGHTED.csv", row.names = FALSE)
 
-write.csv(Habitat_amphibian_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Amphibians.csv", row.names = FALSE)
-write.csv(Habitat_bird_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Birds.csv", row.names = FALSE)
-write.csv(Habitat_reptile_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Reptiles.csv", row.names = FALSE)
-write.csv(Habitat_mammal_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Mammals.csv", row.names = FALSE)
+write.csv(Habitat_amphibian_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Amphibians_v2.csv", row.names = FALSE)
+write.csv(Habitat_bird_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Birds_v2.csv", row.names = FALSE)
+write.csv(Habitat_reptile_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Reptiles_v2.csv", row.names = FALSE)
+write.csv(Habitat_mammal_UN, "../../Results/0.Processed_IUCN_Habitatdata/No_taxonomic_correction/Mammals_v2.csv", row.names = FALSE)
 
 
 ## Looking at the distributions with and without weights

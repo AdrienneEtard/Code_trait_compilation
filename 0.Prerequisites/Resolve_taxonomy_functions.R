@@ -833,7 +833,7 @@ Replace_by_accepted_name <- function(Syn, TargetDF, colnamespecies) {
           # TargetDF$Best_guess_binomial[i] <- Syn$Accepted[Syn$CorrectedTypos==Names[i]]
         }
        
-        # print(i)
+        print(i)
       }
     
   print(paste("Delta in species number:", length(unique(Names))- length(unique(TargetDF$Best_guess_binomial))))

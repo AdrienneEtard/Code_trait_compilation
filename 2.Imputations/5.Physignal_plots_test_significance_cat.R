@@ -115,6 +115,30 @@ Plot_Lambda_All <- function(Lambda_c, Lambda_o) {
 }
 
 
+Plot_Lambda <- function(Lambda_c) {
+  
+  Lambda <- Lambda_c[1,]
+  Lambda<- reshape::melt(Lambda)
+  
+  GGPoptions <- theme_bw() + theme(
+    panel.border = element_rect(colour = "black", fill=NA),
+    text = element_text(size=13, family="serif"), 
+    axis.text.x = element_text(color="black", margin=ggplot2::margin(10,0,2,0,"pt"), size=13), 
+    axis.text.y = element_text(color="black", margin=ggplot2::margin(0,10,0,0,"pt"), size=13),
+    axis.ticks.length=unit(-0.1, "cm"),
+    legend.text=element_text(size=13))
+  
+  p <- ggplot(Lambda, aes(variable, value)) + 
+    geom_point(shape=24, alpha=0.8, col="blue", fill="blue") + #position = position_dodge(width=0.2), 
+    geom_hline(yintercept= 0.9, linetype="dashed") +
+    #scale_y_continuous(trans="log10", breaks = c(0.7,0.8,0.9,1)) +
+    ylab(expression(lambda)) +
+    GGPoptions
+  
+  return(p)
+}
+
+
 ## Function to run Wilcoxon Rank Sum and Signed rank tests
 ## Testing whether the observed median is significantly different from the null distribution for phylogenetic signal in categorcial traits
 Wilcox_Test <- function(Simulations, Delta) {
@@ -201,12 +225,12 @@ pAmphibians_c <- Plot_Delta(DeltaAmphibians_c) + scale_x_discrete(labels=c("DA",
 # plot(density(SimAmphibians_c$Primary_diet, na.rm=TRUE))
 
 
-# pcatc <- ggarrange(pMammals_c + labs(tag = "A") + theme(plot.tag.position = c(0.95, 0.94)), 
-#                pBirds_c + labs(tag = "B") + theme(plot.tag.position = c(0.95, 0.94)) + ylab(""),
-#                pReptiles_c + labs(tag = "C") + theme(plot.tag.position = c(0.95, 0.94)), 
-#                pAmphibians_c + labs(tag = "D") + theme(plot.tag.position = c(0.95, 0.94)) + ylab(""))
+pcatc <- ggarrange(pMammals_c + theme(plot.tag.position = c(0.95, 0.94)) + ggtitle("Mammals"),
+               pBirds_c  + ggtitle("Birds") + theme(plot.tag.position = c(0.95, 0.94)) + ylab(""),
+               pReptiles_c  + ggtitle("Reptiles") + theme(plot.tag.position = c(0.95, 0.94)),
+               pAmphibians_c  + ggtitle("Amphibians") + theme(plot.tag.position = c(0.95, 0.94)) + ylab(""))
 # ggsave(pcatc, file="../../Results/Plots/Phylosignal_categorical/Allclasses_correctedtree.pdf", height=4, width=5)
-
+ggsave(pcatc, file="../../Results/Plots_CBER_talk_20119/Pysicat.png", height=4, width=5)
 
 ## Phylogenetic signal in categorical traits with original phylogenies
 # Mammals_o
@@ -350,4 +374,11 @@ WTestsO <- rbind(WBirds, WReptiles, WMammals, WAmphibians)
 max(WTestsO$W_pvalue)
 write.csv(WTestsO,"../../Results/1.Traits_before_imputations/Phylogenetic_signal/Categorical_traits_significance_Wilcoxon_original.csv", row.names = TRUE)
 
+pcomtc<-ggarrange(
+Plot_Lambda(Lambda_M_c) + scale_x_discrete(labels=c("BM", "L", "LCS", "DB", "RS", "HB", "GL", "BL")) + xlab("") + ggtitle("Mammals"),
+Plot_Lambda(Lambda_B_c) + scale_x_discrete(labels=c("BM", "L", "LCS", "DB", "RS", "HB", "GL")) + xlab("") + ylab("") + ggtitle("Birds"),
+Plot_Lambda(Lambda_R_c) + scale_x_discrete(labels=c("BM", "L", "LCS", "RS", "HB", "BL", "SM"))+ xlab("")+ ggtitle("Reptiles"),
+Plot_Lambda(Lambda_A_c) + scale_x_discrete(labels=c("BM", "L", "LCS", "DB", "RS", "HB", "BL"))+ xlab("")+ ylab("") + ggtitle("Amphibians")
+)
+ggsave(pcomtc, file="../../Results/Plots_CBER_talk_20119/Pysicont.png", height=4, width=6)
 

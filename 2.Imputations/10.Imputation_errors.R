@@ -109,8 +109,6 @@ Imputed <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_corrected_tre
 
 # imputed with original trees
 Imputed_o <- readRDS("../../Results/2.Imputed_trait_datasets/Imputed_original_trees/List_of_8_sets.rds")
-
-
 ## With corrected phylogenies
 
 ## Amphibians

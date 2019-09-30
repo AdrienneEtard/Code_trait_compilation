@@ -233,6 +233,7 @@ MammalDIET_UN <- For.MammalDiet(MammalDIET_UN)
 
 Elton_mammals_C <- Elton.Mammals(Elton_mammals_C)
 Elton_mammals_UN <- Elton.Mammals(Elton_mammals_UN)
+
 Elton_mammals_C <- For.Elton(Elton_mammals_C)
 Elton_mammals_UN <- For.Elton(Elton_mammals_UN)
 

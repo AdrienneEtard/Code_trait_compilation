@@ -1,11 +1,11 @@
 ## Taxonomic corrections: overview
 
 #### Preamble
-
 library(dplyr)
 library(reshape)
 library(ggplot2)
 library(ggpubr)
+`%nin%` <- Negate(`%in%`)
 
 GGPoptions <- theme_classic() + theme(
   panel.border = element_rect(colour = "black", fill=NA),
@@ -59,11 +59,12 @@ Delta <- function(SynM, SynA, SynB, SynR) {
   return(list(p=p, n=toplot))
   
 }
-Delta(SynM, SynA, SynB, SynR)$p + ylab("Binomial names")
+
 
 
 ## Species with the most number of replicates
 MaxSyn <- function(Syn) {
+  browser()
   Table <- Syn %>% 
     filter(Accepted!="") %>%
     group_by(Accepted) %>% 
@@ -127,12 +128,21 @@ length(Syn_Birds$Manual_edits[Syn_Birds$Manual_edits==TRUE])
 length(Syn_Reptiles$Manual_edits[Syn_Reptiles$Manual_edits==TRUE])
 length(Syn_Amphibians$Manual_edits[Syn_Amphibians$Manual_edits==TRUE])
 
-
 ## Load species in compiled trait datasets
 M <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Mammals.csv")
 B <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Birds.csv")
 R <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Reptiles.csv")
 A <- read.csv("../../Results/1.Traits_before_imputations/With_taxonomic_correction/All_species/3.with_phylo_eigenvectors/Amphibians.csv")
+
+## mammals: filter non-terrestrial species out
+M <- M %>%
+  filter(Order %nin% c("SIRENIA")) %>%
+  filter(Family %nin% c("OTARIIDAE", "PHOCIDAE", "ODOBENIDAE", 
+                        "BALAENIDAE", "BALAENOPTERIDAE", "ZIPHIIDAE", 
+                        "NEOBALAENIDAE", "DELPHINIDAE", "MONODONTIDAE",
+                        "ESCHRICHTIIDAE", "INIIDAE", "PHYSETERIDAE","LIPOTIDAE",
+                        "PHOCOENIDAE", "PLATANISTIDAE", "PONTOPORIIDAE"))
+
 
 SynM <- Syn_Mammals %>% filter(Accepted %in% M$Best_guess_binomial)
 SynB <- Syn_Birds %>% filter(Accepted %in% B$Best_guess_binomial)
@@ -168,4 +178,15 @@ X <- Dist_NR(Syn)$Freq
 
 p <- ggarrange(p1, p2, widths = c(1/2, 1/2))
 ggsave(p, file="../../Results/Plots/Taxonomic_corrections/tax_corrections.pdf", width = 14, height = 6)
+
+
+## cber talk
+synplot <- Dist_NR(Syn)$p + theme(legend.background = element_rect(color="white"), legend.position = c(0.89,0.88))
+ggsave(synplot, filename="../../Results/Plots_CBER_talk_20119/synonyms_dist.png", width = 10, height = 7, dpi =1000)
+
+species_numbers = Delta(Syn_Mammals, Syn_Amphibians, Syn_Birds, Syn_Reptiles)$p + ylab("Binomial names")+ xlab("")+ theme(legend.background = element_rect(color="white"), legend.position = c(0.86505,0.90505))
+ggsave(species_numbers, filename="../../Results/Plots_CBER_talk_20119/synonymy_delta_species.png", width = 8, height = 7, dpi =1000)
+
+
+
 

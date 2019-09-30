@@ -181,7 +181,7 @@ Predicts$Best_guess_binomial[Predicts$Parsed_name=="White piegon"] <- "Columba l
 Predicts$Best_guess_binomial[Predicts$Parsed_name=="Simla crested tit"] <-"Lophophanes dichrous"
 Predicts$Best_guess_binomial[Predicts$Parsed_name=="Cacomantis esculena"] <- "Collocalia esculenta"
 Predicts$Best_guess_binomial[Predicts$Parsed_name=="Bush lark"] <- ""
-Predicts$Best_guess_binomial[Predicts$Parsed_name=="Imperial pigeon"] <- ""
+Predicts$Best_guess_binomial[Predicts$Parsed_name=="Imperial pigeon"] <- "" # gonzalo
 Predicts$Best_guess_binomial[Predicts$Parsed_name=="Tailor bird"] <- ""
 Predicts$Best_guess_binomial[Predicts$Parsed_name=="Paradise flycatcher"] <- ""
 

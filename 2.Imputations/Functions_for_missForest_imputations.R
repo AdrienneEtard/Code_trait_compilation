@@ -21,6 +21,8 @@
 
 Imputations_missForest <- function (TraitDF, Taxinfo, Traits_cont, Traits_cat, EV, ErrorTrue, DietTRUE, std) {
 
+  ## order by alphabetical order
+  TraitDF <-  TraitDF[order(TraitDF$Best_guess_binomial),]
   
   ## Select traits of interest, to impute, and phylogenetic eigenvectors, and taxinfo 
   To_impute <- TraitDF[, colnames(TraitDF) %in% c(Taxinfo, Traits_cont, Traits_cat, EV)]
